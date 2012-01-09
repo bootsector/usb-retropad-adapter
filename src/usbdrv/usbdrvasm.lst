@@ -338,7 +338,6 @@
  194               	#  include <avr/iom3250.h>
  195               	#elif defined (__AVR_ATmega328P__)
  196               	#  include <avr/iom328p.h>
-   1               	/* Copyright (c) 2007 Atmel Corporation
  197               	#elif defined (__AVR_ATmega329__)
  198               	#  include <avr/iom329.h>
  199               	#elif defined (__AVR_ATmega329P__)
@@ -369,6 +368,7 @@
  224               	#  include <avr/iom168.h>
  225               	#elif defined (__AVR_ATmega168P__)
  226               	#  include <avr/iom168p.h>
+   1               	/* Copyright (c) 2007 Atmel Corporation
  227               	#elif defined (__AVR_ATmega169__)
  228               	#  include <avr/iom169.h>
  229               	#elif defined (__AVR_ATmega169P__)
