@@ -364,14 +364,14 @@ void gc_loop() {
 
 		gamepad_state.r1_btn = (button_data[1] & 0x20) > 0;
 
-		gamepad_state.l2_btn = gamepad_state.r2_btn = (button_data[1] & 0x10) > 0;
+		gamepad_state.l2_btn = (button_data[1] & 0x10) > 0;
 
 		gamepad_state.ps_btn = (button_data[1] & 0x08) && (button_data[0] & 0x10); // UP + START = PS button
 
 		gamepad_state.l_x_axis = button_data[2];
-		gamepad_state.l_y_axis = 0xFF - button_data[3];
+		gamepad_state.l_y_axis = ~button_data[3];
 		gamepad_state.r_x_axis = button_data[4];
-		gamepad_state.r_y_axis = 0xFF - button_data[5];
+		gamepad_state.r_y_axis = ~button_data[5];
 
 		vs_send_pad_state();
 	}
@@ -402,7 +402,7 @@ void n64_loop() {
 
 		gamepad_state.r1_btn = (button_data[1] & 0x10) > 0;
 
-		gamepad_state.l2_btn = gamepad_state.r2_btn = (button_data[0] & 0x20) > 0;
+		gamepad_state.l2_btn = (button_data[0] & 0x20) > 0;
 
 		gamepad_state.ps_btn = (button_data[0] & 0x08) && (button_data[0] & 0x10);  // UP + START = PS button
 
