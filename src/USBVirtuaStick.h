@@ -79,7 +79,7 @@ typedef struct {
 } gamepad_state_t;
 
 void vs_reset_pad_status();
-void vs_init();
+void vs_init(bool watchdog);
 void vs_reset_watchdog();
 void vs_send_pad_state();
 

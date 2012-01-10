@@ -68,7 +68,7 @@ int detectPad() {
 
 void setup() {
 	// Initialize USB joystick driver
-	vs_init();
+	vs_init(false);
 
 	// Set pad/arcade detection pins as input, turning pull-ups on
 	pinModeFast(DETPIN1, INPUT);
@@ -90,7 +90,7 @@ void genesis_loop() {
 	genesis_init();
 
 	for (;;) {
-		vs_reset_watchdog();
+		//vs_reset_watchdog();
 
 		button_data = genesis_read();
 
@@ -137,7 +137,7 @@ void arcade_loop() {
 	NESPad::init();
 
 	for (;;) {
-		vs_reset_watchdog();
+		//vs_reset_watchdog();
 
 		button_data = NESPad::read(16);
 
@@ -191,7 +191,7 @@ void nes_loop() {
 	NESPad::init();
 
 	for (;;) {
-		vs_reset_watchdog();
+		//vs_reset_watchdog();
 
 		button_data = NESPad::read(8);
 
@@ -230,7 +230,7 @@ void snes_loop() {
 	NESPad::init();
 
 	for (;;) {
-		vs_reset_watchdog();
+		//vs_reset_watchdog();
 
 		button_data = NESPad::read(16);
 
@@ -278,7 +278,7 @@ void ps2_loop() {
 	while (psPad.config_gamepad(8, 6, 7, 5, false, false) == 1);
 
 	for (;;) {
-		vs_reset_watchdog();
+		//vs_reset_watchdog();
 
 		psPad.read_gamepad();
 
@@ -342,7 +342,7 @@ void gc_loop() {
 	GCPad_init();
 
 	for(;;) {
-		vs_reset_watchdog();
+		//vs_reset_watchdog();
 
 		button_data = GCPad_read();
 
@@ -384,7 +384,7 @@ void n64_loop() {
 	GCPad_init();
 
 	for(;;) {
-		vs_reset_watchdog();
+		//vs_reset_watchdog();
 
 		button_data = N64Pad_read();
 

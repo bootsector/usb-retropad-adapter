@@ -95,12 +95,16 @@ void vs_reset_pad_status() {
 	gamepad_state.r_y_axis = 0x80;
 }
 
-void vs_init() {
+void vs_init(bool watchdog) {
 	uchar i;
 
 	vs_reset_pad_status();
 
-	wdt_enable(WDTO_1S);
+	if(watchdog) {
+		wdt_enable(WDTO_1S);
+	} else {
+		wdt_disable();
+	}
 	/* Even if you don't use the watchdog, turn it off here. On newer devices,
 	 * the status of the watchdog (on/off, period) is PRESERVED OVER RESET!
 	 */
