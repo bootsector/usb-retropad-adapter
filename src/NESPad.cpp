@@ -24,8 +24,8 @@ int NESPad::_clock, NESPad::_latch, NESPad::_data;
 
 void NESPad::init(int clock, int latch, int data) {
 	_clock = clock;
-	_latch = _latch;
-	_data = _data;
+	_latch = latch;
+	_data = data;
 
 	pinModeFast(_clock, OUTPUT);
 	pinModeFast(_latch, OUTPUT);
