@@ -134,7 +134,7 @@ void genesis_loop() {
 void arcade_loop() {
 	int button_data;
 
-	NESPad::init();
+	NESPad::init(5, 6, 13);
 
 	for (;;) {
 		//vs_reset_watchdog();
@@ -188,7 +188,7 @@ void arcade_loop() {
 void nes_loop() {
 	int button_data;
 
-	NESPad::init();
+	NESPad::init(5, 6, 7);
 
 	for (;;) {
 		//vs_reset_watchdog();
@@ -227,7 +227,7 @@ void nes_loop() {
 void snes_loop() {
 	int button_data;
 
-	NESPad::init();
+	NESPad::init(5, 6, 7);
 
 	for (;;) {
 		//vs_reset_watchdog();

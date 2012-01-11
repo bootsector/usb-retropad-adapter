@@ -1,6 +1,6 @@
 /*
-* Wii RetroPad Adapter - Nintendo Wiimote adapter for retro-controllers!
-* Copyright (c) 2011 Bruno Freitas - bootsector@ig.com.br
+* USB RetroPad Adapter - PC/PS3 USB adapter for retro-controllers!
+* Copyright (c) 2012 Bruno Freitas - bootsector@ig.com.br
 *
 * PS2 Arduino Controller Library (c) by Bill Porter:
 * http://www.billporter.info/?p=240
