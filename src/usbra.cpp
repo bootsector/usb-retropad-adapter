@@ -134,7 +134,7 @@ void genesis_loop() {
 void arcade_loop() {
 	int button_data;
 
-	NESPad::init(5, 6, 13);
+	NESPad::init(6, 7, 13);
 
 	for (;;) {
 		//vs_reset_watchdog();
