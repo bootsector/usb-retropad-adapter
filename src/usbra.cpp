@@ -58,7 +58,7 @@ byte pad_dir[16] = {8, 2, 6, 8, 4, 3, 5, 8, 0, 1, 7, 8, 8, 8, 8, 8};
 int detectPad() {
 	int pad;
 
-	if(!digitalReadFast(ARCADE_DB9_PIN))
+	if(digitalReadFast(ARCADE_DB9_PIN))
 		return PAD_ARCADE;
 
 	pad = (digitalReadFast(DETPIN1) << 2) | digitalReadFast(DETPIN2) << 1 | digitalReadFast(DETPIN3);
