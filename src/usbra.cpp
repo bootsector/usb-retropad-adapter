@@ -325,6 +325,10 @@ void ps2_loop() {
 
 		gamepad_state.r2_btn = psPad.Button(PSB_R2);
 
+		gamepad_state.l3_btn = psPad.Button(PSB_L3);
+
+		gamepad_state.r3_btn = psPad.Button(PSB_R3);
+
 		gamepad_state.select_btn = psPad.Button(PSB_SELECT);
 
 		gamepad_state.start_btn = psPad.Button(PSB_START);

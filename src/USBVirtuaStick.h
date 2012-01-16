@@ -46,7 +46,8 @@ typedef struct {
 
 	uint8_t select_btn : 1;
 	uint8_t start_btn : 1;
-	uint8_t : 2;
+	uint8_t l3_btn : 1;
+	uint8_t r3_btn : 1;
 	uint8_t ps_btn : 1;
 	uint8_t : 3;
 
