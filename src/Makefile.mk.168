@@ -293,7 +293,7 @@ AVRDUDE_PORT = //./COM6    # programmer connected to serial device
 AVRDUDE_BAUD = 19200   # serial device baud rate
 
 # Fuses config
-AVRDUDE_HFUSE = 0xdd
+AVRDUDE_HFUSE = 0xdf
 AVRDUDE_LFUSE = 0xff
 AVRDUDE_EFUSE = 0x06
 
