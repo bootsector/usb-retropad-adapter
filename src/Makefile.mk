@@ -295,7 +295,7 @@ AVRDUDE_BAUD = 19200   # serial device baud rate
 # Fuses config
 AVRDUDE_HFUSE = 0xde
 AVRDUDE_LFUSE = 0xff
-AVRDUDE_EFUSE = 0x07
+AVRDUDE_EFUSE = 0x05
 
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 #AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
