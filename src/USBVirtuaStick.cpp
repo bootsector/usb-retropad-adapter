@@ -98,6 +98,14 @@ void vs_reset_pad_status() {
 void vs_init(bool watchdog) {
 	uchar i;
 
+	// disable timer 0 overflow interrupt (enabled by Arduino's init() function).
+	// PS3 was having difficulties detecting the adapter if that's enabled.
+#if defined(TIMSK) && defined(TOIE0)
+	(_SFR_BYTE(TIMSK) &= ~_BV(TOIE0));
+#elif defined(TIMSK0) && defined(TOIE0)
+	(_SFR_BYTE(TIMSK0) &= ~_BV(TOIE0));
+#endif
+
 	vs_reset_pad_status();
 
 	if(watchdog) {
