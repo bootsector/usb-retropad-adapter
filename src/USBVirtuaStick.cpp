@@ -100,6 +100,8 @@ void vs_init(bool watchdog) {
 
 	// disable timer 0 overflow interrupt (enabled by Arduino's init() function).
 	// PS3 was having difficulties detecting the adapter if that's enabled.
+	// WARNING: This will mess up with micros(), millis() and delay() Arduino functions!
+	// Use alternate timer functions instead!
 #if defined(TIMSK) && defined(TOIE0)
 	(_SFR_BYTE(TIMSK) &= ~_BV(TOIE0));
 #elif defined(TIMSK0) && defined(TOIE0)
