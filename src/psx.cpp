@@ -1,19 +1,19 @@
 /*
-* Wii RetroPad Adapter - Nintendo Wiimote adapter for retro-controllers!
-* Copyright (c) 2011 Bruno Freitas - bootsector@ig.com.br
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * USB RetroPad Adapter - PC/PS3 USB adapter for retro-controllers!
+ * Copyright (c) 2012 Bruno Freitas - bootsector@ig.com.br
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <WProgram.h>
@@ -21,12 +21,9 @@
 #include "psx.h"
 
 psxpad_state_t pad_state;
+
 byte ps2_data[22];
 byte read_data_cmd[] = {0x01, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-void psx_wait_ack() {
-	delayMicroseconds(50);
-}
 
 void psx_command(byte *command, byte size) {
 	byte data;
@@ -63,9 +60,9 @@ void psx_command(byte *command, byte size) {
 
 		ps2_data[j] = data;
 		command++;
-	}
 
-	delayMicroseconds(CTRL_BYTE_DELAY);
+		delayMicroseconds(CTRL_BYTE_DELAY);
+	}
 }
 
 psxpad_state_t* psx_read(byte* pad_id) {
@@ -112,6 +109,11 @@ psxpad_state_t* psx_read(byte* pad_id) {
 				pad_state.r_y_axis = ps2_data[6];
 				pad_state.l_x_axis = ps2_data[7];
 				pad_state.l_y_axis = ps2_data[8];
+			} else {
+				pad_state.l_x_axis = 0x80;
+				pad_state.l_y_axis = 0x80;
+				pad_state.r_x_axis = 0x80;
+				pad_state.r_y_axis = 0x80;
 			}
 		}
 	}

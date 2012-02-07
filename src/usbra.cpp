@@ -284,19 +284,23 @@ void ps2_loop() {
 		psPad = psx_read(&pad_id);
 
 		if(pad_id == PSX_ID_DIGITAL) {
-			gamepad_state.l_x_axis = 0x80;
-			gamepad_state.l_y_axis = 0x80;
+			gamepad_state.r_x_axis = 0x80;
+			gamepad_state.r_y_axis = 0x80;
 
 			if(psPad->left_btn) {
 				gamepad_state.l_x_axis = 0x00;
 			} else if (psPad->right_btn) {
 				gamepad_state.l_x_axis = 0xFF;
+			} else {
+				gamepad_state.l_x_axis = 0x80;
 			}
 
 			if(psPad->up_btn) {
 				gamepad_state.l_y_axis = 0x00;
 			} else if (psPad->down_btn) {
 				gamepad_state.l_y_axis = 0xFF;
+			} else {
+				gamepad_state.l_y_axis = 0x80;
 			}
 
 		} else {
