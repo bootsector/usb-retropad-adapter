@@ -100,34 +100,29 @@ psxpad_state_t* psx_read(byte* pad_id) {
 
 			data = psx_command(0xff);
 
-			pad_state.select_btn = !(data & (1 << 0));
-			pad_state.start_btn = !(data & (1 << 3));
+			pad_state.select_btn = !(data & (1));
+			pad_state.start_btn = !(data & (8));
 
-			if (id == PSX_ID_DIGITAL) {
-				pad_state.up_btn = !(data & (1 << 4));
-				pad_state.down_btn = !(data & (1 << 6));
-				pad_state.left_btn = !(data & (1 << 7));
-				pad_state.right_btn = !(data & (1 << 5));
-			} else if (id == PSX_ID_A_RED) {
-				pad_state.l3_btn = !(data & (1 << 1));
-				pad_state.r3_btn = !(data & (1 << 2));
+			pad_state.up_btn = !(data & (16));
+			pad_state.down_btn = !(data & (64));
+			pad_state.left_btn = !(data & (128));
+			pad_state.right_btn = !(data & (32));
 
-				pad_state.up_btn = !(data & (1 << 4));
-				pad_state.down_btn = !(data & (1 << 6));
-				pad_state.left_btn = !(data & (1 << 7));
-				pad_state.right_btn = !(data & (1 << 5));
+			if (id == PSX_ID_A_RED) {
+				pad_state.l3_btn = !(data & (2));
+				pad_state.r3_btn = !(data & (4));
 			}
 
 			data = psx_command(0xff);
 
-			pad_state.l2_btn = !(data & (1 << 0));
-			pad_state.r2_btn = !(data & (1 << 1));
-			pad_state.l1_btn = !(data & (1 << 2));
-			pad_state.r1_btn = !(data & (1 << 3));
-			pad_state.triangle_btn = !(data & (1 << 4));
-			pad_state.circle_btn = !(data & (1 << 5));
-			pad_state.cross_btn = !(data & (1 << 6));
-			pad_state.square_btn = !(data & (1 << 7));
+			pad_state.l2_btn = !(data & (1));
+			pad_state.r2_btn = !(data & (2));
+			pad_state.l1_btn = !(data & (4));
+			pad_state.r1_btn = !(data & (8));
+			pad_state.triangle_btn = !(data & (16));
+			pad_state.circle_btn = !(data & (32));
+			pad_state.cross_btn = !(data & (64));
+			pad_state.square_btn = !(data & (128));
 
 			if ((id == PSX_ID_A_RED) | (id == PSX_ID_A_GREEN)) {
 				data = psx_command(0xff);
