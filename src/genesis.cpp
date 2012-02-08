@@ -17,7 +17,6 @@
  */
 
 #include <WProgram.h>
-#include <util/delay.h>
 #include "genesis.h"
 #include "digitalWriteFast.h"
 
@@ -95,7 +94,7 @@ int genesis_read() {
 		digitalWriteFast(DB9P7, LOW);
 
 		// Delay needed for settling joystick down
-		_delay_ms(2);
+		delayMicroseconds(2000);
 	}
 
 	retval = normalbuttons | (extrabuttons << 8);

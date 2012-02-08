@@ -85,7 +85,7 @@ SRC = usbdrv/usbdrv.c usbdrv/oddebug.c
 
 # List C++ source files here. (C dependencies are automatically generated.)
 CPPSRC = main.cpp usbra.cpp USBVirtuaStick.cpp genesis.cpp GCPad_16Mhz.cpp NESPad.cpp \
-psx.cpp
+PS2X_lib.cpp
 
 
 # List Assembler source files here.

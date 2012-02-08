@@ -18,11 +18,11 @@
 
 #include <WProgram.h>
 #include "USBVirtuaStick.h"
+#include "PS2X_lib.h"
 #include "genesis.h"
 #include "NESPad.h"
 #include "GCPad_16Mhz.h"
 #include "digitalWriteFast.h"
-#include "psx.h"
 
 // Arcade mode and extension cable detection pins
 #define ARCADE_DB9_PIN	12
@@ -272,73 +272,70 @@ void snes_loop() {
 }
 
 void ps2_loop() {
-	psxpad_state_t *psPad;
+	PS2X psPad;
 	byte dir = 0;
-	byte pad_id;
 
-	psx_init();
+	//while (psPad.config_gamepad(8, 6, 7, 5, false, false) == 1);
+
+	psPad.config_gamepad(8, 6, 7, 5, false, false);
 
 	for (;;) {
 		//vs_reset_watchdog();
 
-		psPad = psx_read(&pad_id);
+		psPad.read_gamepad();
 
-		if(pad_id == PSX_ID_DIGITAL) {
-			gamepad_state.r_x_axis = 0x80;
-			gamepad_state.r_y_axis = 0x80;
+		if(psPad.readType() == 0) {
+			gamepad_state.l_x_axis = 0x80;
+			gamepad_state.l_y_axis = 0x80;
 
-			if(psPad->left_btn) {
+			if(psPad.Button(PSB_PAD_LEFT)) {
 				gamepad_state.l_x_axis = 0x00;
-			} else if (psPad->right_btn) {
+			} else if (psPad.Button(PSB_PAD_RIGHT)) {
 				gamepad_state.l_x_axis = 0xFF;
-			} else {
-				gamepad_state.l_x_axis = 0x80;
 			}
 
-			if(psPad->up_btn) {
+			if(psPad.Button(PSB_PAD_UP)) {
 				gamepad_state.l_y_axis = 0x00;
-			} else if (psPad->down_btn) {
+			} else if (psPad.Button(PSB_PAD_DOWN)) {
 				gamepad_state.l_y_axis = 0xFF;
-			} else {
-				gamepad_state.l_y_axis = 0x80;
 			}
 
 		} else {
-			gamepad_state.l_x_axis = psPad->l_x_axis;
-			gamepad_state.l_y_axis = psPad->l_y_axis;
-			gamepad_state.r_x_axis = psPad->r_x_axis;
-			gamepad_state.r_y_axis = psPad->r_y_axis;
+			gamepad_state.l_x_axis = psPad.Analog(PSS_LX);
+			gamepad_state.l_y_axis = psPad.Analog(PSS_LY);
+			gamepad_state.r_x_axis = psPad.Analog(PSS_RX);
+			gamepad_state.r_y_axis = psPad.Analog(PSS_RY);
 
-			dir = psPad->up_btn << 3 | psPad->down_btn << 2 | psPad->left_btn << 1 | psPad->right_btn;
+			dir = psPad.Button(PSB_PAD_UP) << 3 | psPad.Button(PSB_PAD_DOWN) << 2 | psPad.Button(PSB_PAD_LEFT) << 1 | psPad.Button(PSB_PAD_RIGHT);
 
 			gamepad_state.direction = pad_dir[dir];
 		}
 
-		gamepad_state.square_btn = psPad->square_btn;
+		gamepad_state.square_btn = psPad.Button(PSB_SQUARE);
 
-		gamepad_state.cross_btn = psPad->cross_btn;
+		gamepad_state.cross_btn = psPad.Button(PSB_CROSS);
 
-		gamepad_state.circle_btn = psPad->circle_btn;
+		gamepad_state.circle_btn = psPad.Button(PSB_CIRCLE);
 
-		gamepad_state.l1_btn = psPad->l1_btn;
+		gamepad_state.l1_btn =psPad.Button(PSB_L1);
 
-		gamepad_state.l2_btn = psPad->l2_btn;
+		gamepad_state.l2_btn =psPad.Button(PSB_L2);
 
-		gamepad_state.triangle_btn = psPad->triangle_btn;
+		gamepad_state.triangle_btn = psPad.Button(PSB_TRIANGLE);
 
-		gamepad_state.r1_btn = psPad->r1_btn;
+		gamepad_state.r1_btn = psPad.Button(PSB_R1);
 
-		gamepad_state.r2_btn = psPad->r2_btn;
+		gamepad_state.r2_btn = psPad.Button(PSB_R2);
 
-		gamepad_state.l3_btn = psPad->l3_btn;
+		gamepad_state.l3_btn = psPad.Button(PSB_L3);
 
-		gamepad_state.r3_btn = psPad->r3_btn;
+		gamepad_state.r3_btn = psPad.Button(PSB_R3);
 
-		gamepad_state.select_btn = psPad->select_btn;
+		gamepad_state.select_btn = psPad.Button(PSB_SELECT);
 
-		gamepad_state.start_btn = psPad->start_btn;
+		gamepad_state.start_btn = psPad.Button(PSB_START);
 
-		gamepad_state.ps_btn = psPad->select_btn && psPad->start_btn; // SELECT + START = PS Button
+		gamepad_state.ps_btn = psPad.Button(PSB_SELECT) && psPad.Button(PSB_START); // SELECT + START = PS Button
 
 		vs_send_pad_state();
 	}
