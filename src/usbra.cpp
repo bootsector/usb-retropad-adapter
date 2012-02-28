@@ -110,16 +110,22 @@ void genesis_loop() {
 		}
 
 		gamepad_state.square_btn = (button_data & GENESIS_A) > 0;
+		gamepad_state.square_axis = (gamepad_state.square_btn ? 0xFF : 0x00);
 
 		gamepad_state.cross_btn = (button_data & GENESIS_B) > 0;
+		gamepad_state.cross_axis = (gamepad_state.cross_btn ? 0xFF : 0x00);
 
 		gamepad_state.circle_btn = (button_data & GENESIS_C) > 0;
+		gamepad_state.circle_axis = (gamepad_state.circle_btn ? 0xFF : 0x00);
 
 		gamepad_state.l1_btn = (button_data & GENESIS_X) > 0;
+		gamepad_state.l1_axis = (gamepad_state.l1_btn ? 0xFF : 0x00);
 
 		gamepad_state.triangle_btn = (button_data & GENESIS_Y) > 0;
+		gamepad_state.triangle_axis = (gamepad_state.triangle_btn ? 0xFF : 0x00);
 
 		gamepad_state.r1_btn = (button_data & GENESIS_Z) > 0;
+		gamepad_state.r1_axis = (gamepad_state.r1_btn ? 0xFF : 0x00);
 
 		gamepad_state.select_btn = (button_data & GENESIS_MODE) > 0;
 
@@ -158,20 +164,28 @@ void arcade_loop() {
 		}
 
 		gamepad_state.square_btn = (button_data & 0x10) > 0;
+		gamepad_state.square_axis = (gamepad_state.square_btn ? 0xFF : 0x00);
 
 		gamepad_state.cross_btn = (button_data & 0x20) > 0;
+		gamepad_state.cross_axis = (gamepad_state.cross_btn ? 0xFF : 0x00);
 
 		gamepad_state.triangle_btn = (button_data & 0x40) > 0;
+		gamepad_state.triangle_axis = (gamepad_state.triangle_btn ? 0xFF : 0x00);
 
 		gamepad_state.circle_btn = (button_data & 0x80) > 0;
+		gamepad_state.circle_axis = (gamepad_state.circle_btn ? 0xFF : 0x00);
 
 		gamepad_state.l1_btn = (button_data & 0x100) > 0;
+		gamepad_state.l1_axis = (gamepad_state.l1_btn ? 0xFF : 0x00);
 
 		gamepad_state.r1_btn = (button_data & 0x200) > 0;
+		gamepad_state.r1_axis = (gamepad_state.r1_btn ? 0xFF : 0x00);
 
 		gamepad_state.l2_btn = (button_data & 0x400) > 0;
+		gamepad_state.l2_axis = (gamepad_state.l2_btn ? 0xFF : 0x00);
 
 		gamepad_state.r2_btn = (button_data & 0x800) > 0;
+		gamepad_state.r2_axis = (gamepad_state.r2_btn ? 0xFF : 0x00);
 
 		gamepad_state.select_btn = (button_data & 0x1000) > 0;
 
@@ -211,8 +225,10 @@ void nes_loop() {
 		}
 
 		gamepad_state.square_btn = (button_data & 2) > 0;
+		gamepad_state.square_axis = (gamepad_state.square_btn ? 0xFF : 0x00);
 
 		gamepad_state.cross_btn = (button_data & 1) > 0;
+		gamepad_state.cross_axis = (gamepad_state.cross_btn ? 0xFF : 0x00);
 
 		gamepad_state.select_btn = (button_data & 4) > 0;
 
@@ -250,16 +266,22 @@ void snes_loop() {
 		}
 
 		gamepad_state.square_btn = (button_data & 2) > 0;
+		gamepad_state.square_axis = (gamepad_state.square_btn ? 0xFF : 0x00);
 
 		gamepad_state.cross_btn = (button_data & 1) > 0;
+		gamepad_state.cross_axis = (gamepad_state.cross_btn ? 0xFF : 0x00);
 
 		gamepad_state.circle_btn = (button_data & 256) > 0;
+		gamepad_state.circle_axis = (gamepad_state.circle_btn ? 0xFF : 0x00);
 
 		gamepad_state.l1_btn = (button_data & 1024) > 0;
+		gamepad_state.l1_axis = (gamepad_state.l1_btn ? 0xFF : 0x00);
 
 		gamepad_state.triangle_btn = (button_data & 512) > 0;
+		gamepad_state.triangle_axis = (gamepad_state.triangle_btn ? 0xFF : 0x00);
 
 		gamepad_state.r1_btn = (button_data & 2048) > 0;
+		gamepad_state.r1_axis = (gamepad_state.r1_btn ? 0xFF : 0x00);
 
 		gamepad_state.select_btn = (button_data & 4) > 0;
 
@@ -316,20 +338,28 @@ void ps2_loop() {
 		}
 
 		gamepad_state.square_btn = psPad.Button(PSB_SQUARE);
+		gamepad_state.square_axis = (gamepad_state.square_btn ? 0xFF : 0x00);
 
 		gamepad_state.cross_btn = psPad.Button(PSB_CROSS);
+		gamepad_state.cross_axis = (gamepad_state.cross_btn ? 0xFF : 0x00);
 
 		gamepad_state.circle_btn = psPad.Button(PSB_CIRCLE);
+		gamepad_state.circle_axis = (gamepad_state.circle_btn ? 0xFF : 0x00);
 
 		gamepad_state.l1_btn =psPad.Button(PSB_L1);
+		gamepad_state.l1_axis = (gamepad_state.l1_btn ? 0xFF : 0x00);
 
 		gamepad_state.l2_btn =psPad.Button(PSB_L2);
+		gamepad_state.l2_axis = (gamepad_state.l2_btn ? 0xFF : 0x00);
 
 		gamepad_state.triangle_btn = psPad.Button(PSB_TRIANGLE);
+		gamepad_state.triangle_axis = (gamepad_state.triangle_btn ? 0xFF : 0x00);
 
 		gamepad_state.r1_btn = psPad.Button(PSB_R1);
+		gamepad_state.r1_axis = (gamepad_state.r1_btn ? 0xFF : 0x00);
 
 		gamepad_state.r2_btn = psPad.Button(PSB_R2);
+		gamepad_state.r2_axis = (gamepad_state.r2_btn ? 0xFF : 0x00);
 
 		gamepad_state.l3_btn = psPad.Button(PSB_L3);
 
@@ -361,20 +391,27 @@ void gc_loop() {
 		gamepad_state.direction = pad_dir[dir];
 
 		gamepad_state.square_btn = (button_data[0] & 0x08) > 0;
+		gamepad_state.square_axis = (gamepad_state.square_btn ? 0xFF : 0x00);
 
 		gamepad_state.cross_btn = (button_data[0] & 0x02) > 0;
+		gamepad_state.cross_axis = (gamepad_state.cross_btn ? 0xFF : 0x00);
 
 		gamepad_state.triangle_btn = (button_data[0] & 0x04) > 0;
+		gamepad_state.triangle_axis = (gamepad_state.triangle_btn ? 0xFF : 0x00);
 
 		gamepad_state.circle_btn = (button_data[0] & 0x01) > 0;
+		gamepad_state.circle_axis = (gamepad_state.circle_btn ? 0xFF : 0x00);
 
 		gamepad_state.start_btn = (button_data[0] & 0x10) > 0;
 
 		gamepad_state.l1_btn = (button_data[1] & 0x40) > 0;
+		gamepad_state.l1_axis = (gamepad_state.l1_btn ? 0xFF : 0x00);
 
 		gamepad_state.r1_btn = (button_data[1] & 0x20) > 0;
+		gamepad_state.r1_axis = (gamepad_state.r1_btn ? 0xFF : 0x00);
 
 		gamepad_state.l2_btn = (button_data[1] & 0x10) > 0;
+		gamepad_state.l2_axis = (gamepad_state.l2_btn ? 0xFF : 0x00);
 
 		gamepad_state.ps_btn = (button_data[1] & 0x08) && (button_data[0] & 0x10); // UP + START = PS button
 
@@ -403,16 +440,21 @@ void n64_loop() {
 		gamepad_state.direction = pad_dir[dir];
 
 		gamepad_state.square_btn = (button_data[0] & 0x40) > 0;
+		gamepad_state.square_axis = (gamepad_state.square_btn ? 0xFF : 0x00);
 
 		gamepad_state.cross_btn = (button_data[0] & 0x80) > 0;
+		gamepad_state.cross_axis = (gamepad_state.cross_btn ? 0xFF : 0x00);
 
 		gamepad_state.start_btn = (button_data[0] & 0x10) > 0;
 
 		gamepad_state.l1_btn = (button_data[1] & 0x20) > 0;
+		gamepad_state.l1_axis = (gamepad_state.l1_btn ? 0xFF : 0x00);
 
 		gamepad_state.r1_btn = (button_data[1] & 0x10) > 0;
+		gamepad_state.r1_axis = (gamepad_state.r1_btn ? 0xFF : 0x00);
 
 		gamepad_state.l2_btn = (button_data[0] & 0x20) > 0;
+		gamepad_state.l2_axis = (gamepad_state.l2_btn ? 0xFF : 0x00);
 
 		gamepad_state.ps_btn = (button_data[0] & 0x08) && (button_data[0] & 0x10);  // UP + START = PS button
 
