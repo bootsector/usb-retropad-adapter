@@ -189,11 +189,11 @@ void arcade_loop() {
 
 		gamepad_state.select_btn = (button_data & 0x1000) > 0;
 
-		gamepad_state.start_btn = (button_data & 2000) > 0;
+		gamepad_state.start_btn = (button_data & 0x2000) > 0;
 
-		gamepad_state.l3_btn = (button_data & 4000) > 0;
+		gamepad_state.l3_btn = (button_data & 0x4000) > 0;
 
-		gamepad_state.ps_btn = (button_data & 8000) > 0;
+		gamepad_state.ps_btn = (button_data & 0x8000) > 0;
 
 		vs_send_pad_state();
 	}
