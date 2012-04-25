@@ -38,6 +38,7 @@
 #define PAD_PS2 	0b100
 #define PAD_GC	 	0b011
 #define PAD_N64		0b010
+#define PAD_NEOGEO	0b001
 
 // Pad directions vector
 byte pad_dir[16] = {8, 2, 6, 8, 4, 3, 5, 8, 0, 1, 7, 8, 8, 8, 8, 8};
@@ -54,6 +55,7 @@ byte pad_dir[16] = {8, 2, 6, 8, 4, 3, 5, 8, 0, 1, 7, 8, 8, 8, 8, 8};
  * 100 - PS2
  * 011 - Game Cube
  * 010 - Nintendo 64
+ * 001 - Neo Geo
  */
 int detectPad() {
 	int pad;
@@ -480,6 +482,54 @@ void n64_loop() {
 	}
 }
 
+void neogeo_loop() {
+	int button_data;
+
+	NESPad::init(5, 6, 7);
+
+	for (;;) {
+		//vs_reset_watchdog();
+
+		button_data = NESPad::read(16);
+
+		gamepad_state.l_x_axis = 0x80;
+		gamepad_state.l_y_axis = 0x80;
+
+		if(button_data & 0x02) {
+			gamepad_state.l_x_axis = 0x00; // LEFT
+		} else if (button_data & 0x800) {
+			gamepad_state.l_x_axis = 0xFF; // RIGHT
+		}
+
+		if(button_data & 0x03) {
+			gamepad_state.l_y_axis = 0x00; // UP
+		} else if (button_data & 0x1000) {
+			gamepad_state.l_y_axis = 0xFF; // DOWN
+		}
+
+		gamepad_state.square_btn = (button_data & 0x8000) > 0;
+		gamepad_state.square_axis = (gamepad_state.square_btn ? 0xFF : 0x00);
+
+		gamepad_state.cross_btn = (button_data & 0x01) > 0;
+		gamepad_state.cross_axis = (gamepad_state.cross_btn ? 0xFF : 0x00);
+
+		gamepad_state.circle_btn = (button_data & 0x400) > 0;
+		gamepad_state.circle_axis = (gamepad_state.circle_btn ? 0xFF : 0x00);
+
+		gamepad_state.triangle_btn = (button_data & 0x200) > 0; // D button is also 0x2000
+		gamepad_state.triangle_axis = (gamepad_state.triangle_btn ? 0xFF : 0x00);
+
+		gamepad_state.select_btn = (button_data & 0x100) > 0;
+
+		gamepad_state.start_btn = (button_data & 0x4000) > 0;
+
+		gamepad_state.ps_btn = (button_data & 0x100) && (button_data & 0x4000); // SELECT + START = PS Button
+
+		vs_send_pad_state();
+	}
+}
+
+
 void loop() {
 	switch (detectPad()) {
 	case PAD_ARCADE:
@@ -499,6 +549,9 @@ void loop() {
 		break;
 	case PAD_N64:
 		n64_loop();
+		break;
+	case PAD_NEOGEO:
+		neogeo_loop();
 		break;
 	default:
 		genesis_loop();
