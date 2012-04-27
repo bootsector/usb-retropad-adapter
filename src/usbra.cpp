@@ -381,7 +381,10 @@ void gc_loop() {
 	byte *button_data;
 	byte dir = 0;
 
-	GCPad_init();
+	while(GCPad_init() == 0) {
+		delayMicroseconds(10000); // 10ms delay
+		vs_send_pad_state();
+	}
 
 	for(;;) {
 		//vs_reset_watchdog();
@@ -430,7 +433,10 @@ void n64_loop() {
 	byte *button_data;
 	byte dir = 0;
 
-	GCPad_init();
+	while(GCPad_init() == 0) {
+		delayMicroseconds(10000); // 10ms delay
+		vs_send_pad_state();
+	}
 
 	for(;;) {
 		//vs_reset_watchdog();

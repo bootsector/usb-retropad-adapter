@@ -21,7 +21,7 @@
 
 void GCPad_send(byte *cmd, byte length);
 void GCPad_recv(byte *buffer, byte bits);
-void GCPad_init();
+byte GCPad_init();
 byte *GCPad_read();
 byte *N64Pad_read();
 

@@ -155,8 +155,9 @@ void GCPad_recv(byte *buffer, byte bits) {
     goto loop;
 }
 
-void GCPad_init() {
+byte GCPad_init() {
 	byte init = 0x00;
+	byte timeout = 64;
 
 	for(int x = 0; x < 64; x++) {
 		raw_joy_data[x] = 0x00;
@@ -171,17 +172,20 @@ void GCPad_init() {
 	}
 
 	noInterrupts();
+
 	GCPad_send(&init, 1);
-	interrupts();
 
 	pinModeFast(JOY_DATA_PIN, INPUT);
+	digitalWriteFast(JOY_DATA_PIN, HIGH);
 
-//	for (int x=0; x<64; x++) {
-//		if (!(PIND & 0x20))
-//			x = 0;
-//	}
+	while((PIND & 0x20) && (--timeout));
 
+	interrupts();
+
+	// Ignore incoming data for 500us
 	delayMicroseconds(500);
+
+	return timeout;
 }
 
 byte *GCPad_read() {
