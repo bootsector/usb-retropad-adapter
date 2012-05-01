@@ -299,9 +299,12 @@ void ps2_loop() {
 	PS2X psPad;
 	byte dir = 0;
 
-	//while (psPad.config_gamepad(8, 6, 7, 5, false, false) == 1);
+	while (psPad.config_gamepad(8, 6, 7, 5, false, false) == 1) {
+		delayMicroseconds(10000); // 10ms delay
+		vs_send_pad_state();
+	}
 
-	psPad.config_gamepad(8, 6, 7, 5, false, false);
+	//psPad.config_gamepad(8, 6, 7, 5, false, false);
 
 	for (;;) {
 		//vs_reset_watchdog();
