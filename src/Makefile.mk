@@ -39,6 +39,9 @@
 # To rebuild project do "make clean" then "make all".
 #----------------------------------------------------------------------------
 
+# SATURN = 1 - Default pad is a Sega Saturn one
+# SATURN = 0 - Default pad is a Sega Genesis one
+SATURN = 0
 
 # MCU name
 MCU = atmega328p
@@ -127,15 +130,15 @@ CSTANDARD = -std=gnu99
 
 
 # Place -D or -U options here for C sources
-CDEFS = -DF_CPU=$(F_CPU)UL -DARDUINO=22 -DDEBUG_LEVEL=0
+CDEFS = -DF_CPU=$(F_CPU)UL -DARDUINO=22 -DDEBUG_LEVEL=0 -DSATURN=$(SATURN)
 
 
 # Place -D or -U options here for ASM sources
-ADEFS = -DF_CPU=$(F_CPU) -DARDUINO=22 -DDEBUG_LEVEL=0
+ADEFS = -DF_CPU=$(F_CPU) -DARDUINO=22 -DDEBUG_LEVEL=0 -DSATURN=$(SATURN)
 
 
 # Place -D or -U options here for C++ sources
-CPPDEFS = -DF_CPU=$(F_CPU)UL -DARDUINO=22 -DDEBUG_LEVEL=0
+CPPDEFS = -DF_CPU=$(F_CPU)UL -DARDUINO=22 -DDEBUG_LEVEL=0 -DSATURN=$(SATURN)
 #CPPDEFS += -D__STDC_LIMIT_MACROS
 #CPPDEFS += -D__STDC_CONSTANT_MACROS
 

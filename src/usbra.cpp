@@ -29,22 +29,20 @@
 #define ARCADE_DB9_PIN	12
 
 // Extension cable detection pins
-#define DETPIN0 8
 #define DETPIN1	9
 #define DETPIN2	10
 #define DETPIN3	11
 
 // Possible values (as of today) returned by the detectPad() routine
 #define PAD_ARCADE		-1
-#define PAD_GENESIS		0b1111
-#define PAD_NES 		0b1110
-#define PAD_SNES 		0b1101
-#define PAD_PS2 		0b1100
-#define PAD_GC	 		0b1011
-#define PAD_N64			0b1010
-#define PAD_NEOGEO		0b1001
-#define PAD_RESERVED1	0b1000
-#define PAD_SATURN		0b0111
+#define PAD_GENESIS		0b111
+#define PAD_NES 		0b110
+#define PAD_SNES 		0b101
+#define PAD_PS2 		0b100
+#define PAD_GC	 		0b011
+#define PAD_N64			0b010
+#define PAD_NEOGEO		0b001
+#define PAD_RESERVED1	0b000
 
 // Pad directions vector
 byte pad_dir[16] = {8, 2, 6, 8, 4, 3, 5, 8, 0, 1, 7, 8, 8, 8, 8, 8};
@@ -55,15 +53,14 @@ byte pad_dir[16] = {8, 2, 6, 8, 4, 3, 5, 8, 0, 1, 7, 8, 8, 8, 8, 8};
  * the detection.
  *
  *  -1 - Arcade
- * 1111 - Sega Genesis (Default)
- * 1110 - NES
- * 1101 - SNES
- * 1100 - PS2
- * 1011 - Game Cube
- * 1010 - Nintendo 64
- * 1001 - Neo Geo
- * 1000 - Reserved 1
- * 0111 - Sega Saturn
+ * 111 - Sega Genesis (Default)
+ * 110 - NES
+ * 101 - SNES
+ * 100 - PS2
+ * 011 - Game Cube
+ * 010 - Nintendo 64
+ * 001 - Neo Geo
+ * 000 - Reserved 1
  */
 int detectPad() {
 	int pad;
@@ -71,7 +68,7 @@ int detectPad() {
 	if(digitalReadFast(ARCADE_DB9_PIN))
 		return PAD_ARCADE;
 
-	pad = (digitalReadFast(DETPIN0) << 3) | (digitalReadFast(DETPIN1) << 2) | (digitalReadFast(DETPIN2) << 1) | (digitalReadFast(DETPIN3));
+	pad = (digitalReadFast(DETPIN1) << 2) | (digitalReadFast(DETPIN2) << 1) | (digitalReadFast(DETPIN3));
 
 	return pad;
 }
@@ -81,8 +78,6 @@ void setup() {
 	vs_init(false);
 
 	// Set pad/arcade detection pins as input, turning pull-ups on
-	pinModeFast(DETPIN0, INPUT);
-	digitalWriteFast(DETPIN0, HIGH);
 
 	pinModeFast(DETPIN1, INPUT);
 	digitalWriteFast(DETPIN1, HIGH);
@@ -629,11 +624,12 @@ void loop() {
 	case PAD_NEOGEO:
 		neogeo_loop();
 		break;
-	case PAD_SATURN:
-		saturn_loop();
-		break;
 	default:
+#if SATURN == 1
+		saturn_loop();
+#else
 		genesis_loop();
+#endif
 		break;
 	}
 }
