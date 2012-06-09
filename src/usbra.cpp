@@ -20,42 +20,50 @@
 #include "USBVirtuaStick.h"
 #include "PS2X_lib.h"
 #include "genesis.h"
+#include "saturn.h"
 #include "NESPad.h"
 #include "GCPad_16Mhz.h"
 #include "digitalWriteFast.h"
 
-// Arcade mode and extension cable detection pins
+// Arcade mode detection pin
 #define ARCADE_DB9_PIN	12
+
+// Extension cable detection pins
+#define DETPIN0 8
 #define DETPIN1	9
 #define DETPIN2	10
 #define DETPIN3	11
 
 // Possible values (as of today) returned by the detectPad() routine
-#define PAD_ARCADE	-1
-#define PAD_GENESIS	0b111
-#define PAD_NES 	0b110
-#define PAD_SNES 	0b101
-#define PAD_PS2 	0b100
-#define PAD_GC	 	0b011
-#define PAD_N64		0b010
-#define PAD_NEOGEO	0b001
+#define PAD_ARCADE		-1
+#define PAD_GENESIS		0b1111
+#define PAD_NES 		0b1110
+#define PAD_SNES 		0b1101
+#define PAD_PS2 		0b1100
+#define PAD_GC	 		0b1011
+#define PAD_N64			0b1010
+#define PAD_NEOGEO		0b1001
+#define PAD_RESERVED1	0b1000
+#define PAD_SATURN		0b0111
 
 // Pad directions vector
 byte pad_dir[16] = {8, 2, 6, 8, 4, 3, 5, 8, 0, 1, 7, 8, 8, 8, 8, 8};
 
 /*
  * This is the new auto-detect function (non jumper based) which detects the extension
- * cable plugged in the DB9 port. It uses last 3 data pins from DB9 (6, 7 and 9) for
+ * cable plugged in the DB9 port. It uses grounded pins from DB9 (4, 6, 7 and 9) for
  * the detection.
  *
  *  -1 - Arcade
- * 111 - Sega Genesis (Default)
- * 110 - NES
- * 101 - SNES
- * 100 - PS2
- * 011 - Game Cube
- * 010 - Nintendo 64
- * 001 - Neo Geo
+ * 1111 - Sega Genesis (Default)
+ * 1110 - NES
+ * 1101 - SNES
+ * 1100 - PS2
+ * 1011 - Game Cube
+ * 1010 - Nintendo 64
+ * 1001 - Neo Geo
+ * 1000 - Reserved 1
+ * 0111 - Sega Saturn
  */
 int detectPad() {
 	int pad;
@@ -63,7 +71,7 @@ int detectPad() {
 	if(digitalReadFast(ARCADE_DB9_PIN))
 		return PAD_ARCADE;
 
-	pad = (digitalReadFast(DETPIN1) << 2) | digitalReadFast(DETPIN2) << 1 | digitalReadFast(DETPIN3);
+	pad = (digitalReadFast(DETPIN0) << 3) | (digitalReadFast(DETPIN1) << 2) | (digitalReadFast(DETPIN2) << 1) | (digitalReadFast(DETPIN3));
 
 	return pad;
 }
@@ -73,6 +81,9 @@ void setup() {
 	vs_init(false);
 
 	// Set pad/arcade detection pins as input, turning pull-ups on
+	pinModeFast(DETPIN0, INPUT);
+	digitalWriteFast(DETPIN0, HIGH);
+
 	pinModeFast(DETPIN1, INPUT);
 	digitalWriteFast(DETPIN1, HIGH);
 
@@ -538,6 +549,62 @@ void neogeo_loop() {
 	}
 }
 
+void saturn_loop() {
+	int button_data;
+
+	saturn_init();
+
+	for (;;) {
+		//vs_reset_watchdog();
+
+		button_data = saturn_read();
+
+		gamepad_state.l_x_axis = 0x80;
+		gamepad_state.l_y_axis = 0x80;
+
+		if(button_data & SATURN_LEFT) {
+			gamepad_state.l_x_axis = 0x00;
+		} else if (button_data & SATURN_RIGHT) {
+			gamepad_state.l_x_axis = 0xFF;
+		}
+
+		if(button_data & SATURN_UP) {
+			gamepad_state.l_y_axis = 0x00;
+		} else if (button_data & SATURN_DOWN) {
+			gamepad_state.l_y_axis = 0xFF;
+		}
+
+		gamepad_state.square_btn = (button_data & SATURN_A) > 0;
+		gamepad_state.square_axis = (gamepad_state.square_btn ? 0xFF : 0x00);
+
+		gamepad_state.cross_btn = (button_data & SATURN_B) > 0;
+		gamepad_state.cross_axis = (gamepad_state.cross_btn ? 0xFF : 0x00);
+
+		gamepad_state.circle_btn = (button_data & SATURN_C) > 0;
+		gamepad_state.circle_axis = (gamepad_state.circle_btn ? 0xFF : 0x00);
+
+		gamepad_state.l1_btn = (button_data & SATURN_X) > 0;
+		gamepad_state.l1_axis = (gamepad_state.l1_btn ? 0xFF : 0x00);
+
+		gamepad_state.triangle_btn = (button_data & SATURN_Y) > 0;
+		gamepad_state.triangle_axis = (gamepad_state.triangle_btn ? 0xFF : 0x00);
+
+		gamepad_state.r1_btn = (button_data & SATURN_Z) > 0;
+		gamepad_state.r1_axis = (gamepad_state.r1_btn ? 0xFF : 0x00);
+
+		gamepad_state.l2_btn = (button_data & SATURN_L) > 0;
+		gamepad_state.l2_axis = (gamepad_state.l2_btn ? 0xFF : 0x00);
+
+		gamepad_state.r2_btn = (button_data & SATURN_R) > 0;
+		gamepad_state.r2_axis = (gamepad_state.r2_btn ? 0xFF : 0x00);
+
+		gamepad_state.start_btn = (button_data & SATURN_START) > 0;
+
+		gamepad_state.ps_btn = (button_data & SATURN_UP) && (button_data & SATURN_START);
+
+		vs_send_pad_state();
+	}
+}
 
 void loop() {
 	switch (detectPad()) {
@@ -561,6 +628,9 @@ void loop() {
 		break;
 	case PAD_NEOGEO:
 		neogeo_loop();
+		break;
+	case PAD_SATURN:
+		saturn_loop();
 		break;
 	default:
 		genesis_loop();
