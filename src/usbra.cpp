@@ -29,20 +29,25 @@
 #define ARCADE_DB9_PIN	12
 
 // Extension cable detection pins
+#define DETPIN0	8
 #define DETPIN1	9
 #define DETPIN2	10
 #define DETPIN3	11
 
 // Possible values (as of today) returned by the detectPad() routine
+// Normal pads
 #define PAD_ARCADE		-1
-#define PAD_GENESIS		0b111
-#define PAD_NES 		0b110
-#define PAD_SNES 		0b101
-#define PAD_PS2 		0b100
-#define PAD_GC	 		0b011
-#define PAD_N64			0b010
-#define PAD_NEOGEO		0b001
-#define PAD_RESERVED1	0b000
+#define PAD_GENESIS		0b0111
+#define PAD_NES 		0b0110
+#define PAD_SNES 		0b0101
+#define PAD_PS2 		0b0100
+#define PAD_GC	 		0b0011
+#define PAD_N64			0b0010
+#define PAD_NEOGEO		0b0001
+#define PAD_RESERVED1	0b0000
+// Extended pads (uses DB9 pin 4 for identification)
+#define PAD_SATURN		0b1111
+#define PAD_DO_NOT_USE	0b1100 // 3 LSB overlaps with PS2 pad, which uses DB9 pin 4 for CLK.
 
 // Pad directions vector
 byte pad_dir[16] = {8, 2, 6, 8, 4, 3, 5, 8, 0, 1, 7, 8, 8, 8, 8, 8};
@@ -53,32 +58,20 @@ byte pad_dir[16] = {8, 2, 6, 8, 4, 3, 5, 8, 0, 1, 7, 8, 8, 8, 8, 8};
  * the detection.
  *
  *  -1 - Arcade
- * 111 - Sega Genesis (Default)
- * 110 - NES
- * 101 - SNES
- * 100 - PS2
- * 011 - Game Cube
- * 010 - Nintendo 64
- * 001 - Neo Geo
- * 000 - Reserved 1
+ * 0111 - Sega Genesis (Default)
+ * 0110 - NES
+ * 0101 - SNES
+ * 0100 - PS2
+ * 0011 - Game Cube
+ * 0010 - Nintendo 64
+ * 0001 - Neo Geo
+ * 0000 - Reserved 1
+ * 1111 - Sega Saturn
  */
 int detectPad() {
 	int pad;
 
-	if(digitalReadFast(ARCADE_DB9_PIN))
-		return PAD_ARCADE;
-
-	pad = (digitalReadFast(DETPIN1) << 2) | (digitalReadFast(DETPIN2) << 1) | (digitalReadFast(DETPIN3));
-
-	return pad;
-}
-
-void setup() {
-	// Initialize USB joystick driver
-	vs_init(false);
-
 	// Set pad/arcade detection pins as input, turning pull-ups on
-
 	pinModeFast(DETPIN1, INPUT);
 	digitalWriteFast(DETPIN1, HIGH);
 
@@ -90,6 +83,31 @@ void setup() {
 
 	pinModeFast(ARCADE_DB9_PIN, INPUT);
 	digitalWriteFast(ARCADE_DB9_PIN, HIGH);
+
+	// Check switch for Arcade position
+	if(digitalReadFast(ARCADE_DB9_PIN))
+		return PAD_ARCADE;
+
+	// Read extension detection pins statuses
+	pad = (digitalReadFast(DETPIN1) << 2) | (digitalReadFast(DETPIN2) << 1) | (digitalReadFast(DETPIN3));
+
+	// Check if pad is not PS2 pad, that uses DB9 pin 4.
+	// If not, then use pin 4 for additional pads
+	if(pad != PAD_PS2) {
+		pinModeFast(DETPIN0, INPUT);
+		digitalWriteFast(DETPIN0, HIGH);
+
+		pad |= (!digitalReadFast(DETPIN0) << 3);
+
+		digitalWriteFast(DETPIN0, LOW);
+	}
+
+	return pad;
+}
+
+void setup() {
+	// Initialize USB joystick driver
+	vs_init(false);
 }
 
 void genesis_loop() {
@@ -624,12 +642,11 @@ void loop() {
 	case PAD_NEOGEO:
 		neogeo_loop();
 		break;
-	default:
-#if SATURN == 1
+	case PAD_SATURN:
 		saturn_loop();
-#else
+		break;
+	default:
 		genesis_loop();
-#endif
 		break;
 	}
 }
