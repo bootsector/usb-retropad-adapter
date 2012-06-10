@@ -27,6 +27,8 @@
 #define D3 10
 #define D2 11
 
+#define DELAY 7
+
 void saturn_init() {
 	pinModeFast(D1, INPUT);
 	pinModeFast(D0, INPUT);
@@ -44,9 +46,25 @@ void saturn_init() {
 int saturn_read() {
 	int retval = 0;
 
+	/*
+	* S0	S1		D0	d1	d2	d3
+	* Off 	Off 	Z 	Y 	X 	R
+	* On 	Off 	B 	C 	A 	St
+	* Off 	On 		Up 	Dn 	Lt 	Rt
+	* On 	On 		- 	- 	- 	L
+	*/
+
+	// Reading L
+	digitalWriteFast(S0, HIGH);
+	digitalWriteFast(S1, HIGH);
+	delayMicroseconds(DELAY);
+
+	retval |= (!digitalReadFast(D3) << 12); // L
+
 	// Reading Z, Y, X and R
 	digitalWriteFast(S0, LOW);
 	digitalWriteFast(S1, LOW);
+	delayMicroseconds(DELAY);
 
 	retval |= (!digitalReadFast(D0) << 0); // Z
 	retval |= (!digitalReadFast(D1) << 1); // Y
@@ -56,6 +74,7 @@ int saturn_read() {
 	// Reading B, C, A and Start
 	digitalWriteFast(S0, HIGH);
 	digitalWriteFast(S1, LOW);
+	delayMicroseconds(DELAY);
 
 	retval |= (!digitalReadFast(D0) << 4); // B
 	retval |= (!digitalReadFast(D1) << 5); // C
@@ -65,17 +84,12 @@ int saturn_read() {
 	// Reading Up, Down, Left, Right
 	digitalWriteFast(S0, LOW);
 	digitalWriteFast(S1, HIGH);
+	delayMicroseconds(DELAY);
 
 	retval |= (!digitalReadFast(D0) << 8); // Up
 	retval |= (!digitalReadFast(D1) << 9); // Down
 	retval |= (!digitalReadFast(D2) << 10); // Left
 	retval |= (!digitalReadFast(D3) << 11); // Right
-
-	// Reading L
-	digitalWriteFast(S0, HIGH);
-	digitalWriteFast(S1, HIGH);
-
-	retval |= (!digitalReadFast(D3) << 12); // L
 
 	return retval;
 }
