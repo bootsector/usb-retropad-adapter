@@ -209,7 +209,6 @@ PROGMEM char usbHidReportDescriptor[256] = {
 /* ------------------------------------------------------------------------- */
 
 gamepad_state_t gamepad_state;
-static uchar idleRate;
 
 void xbox_reset_pad_status() {
 	memset(&gamepad_state, 0x00, sizeof(gamepad_state_t));
@@ -287,11 +286,6 @@ usbMsgLen_t usbFunctionSetup(uchar data[8]) {
 		if (rq->bRequest == USBRQ_HID_GET_REPORT) { /* wValue: ReportType (highbyte), ReportID (lowbyte) */
 			usbMsgPtr = (unsigned char*) &gamepad_state;
 			return 20;
-		} else if (rq->bRequest == USBRQ_HID_GET_IDLE) {
-			usbMsgPtr = &idleRate;
-			return 1;
-		} else if (rq->bRequest == USBRQ_HID_SET_IDLE) {
-			idleRate = rq->wValue.bytes[1];
 		}
 
 	} else	if ((rq-> bmRequestType & USBRQ_TYPE_MASK) == USBRQ_TYPE_VENDOR) {
@@ -308,7 +302,7 @@ usbMsgLen_t usbFunctionSetup(uchar data[8]) {
 			-wIndex:  0, 0
 			-wLength: 16
 			 */
-			usbMsgPtr = (unsigned char*) ((&gamepad_state) + 20);
+			usbMsgPtr = (unsigned char*) (gamepad_state.reserved_2);
 			return 16;
 		}
 	}
@@ -317,4 +311,8 @@ usbMsgLen_t usbFunctionSetup(uchar data[8]) {
 	}
 
 	return 0; /* default for not implemented requests: return no data back to host */
+}
+
+uchar usbFunctionWrite(uchar *receivedData, uchar len) {
+	return -1;
 }
