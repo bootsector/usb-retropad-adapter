@@ -19,8 +19,6 @@
 #ifndef __usbconfig_h_included__
 #define __usbconfig_h_included__
 
-#define USB_CFG_USE_SWITCH_STATEMENT 0
-
 /* ---------------------------- Hardware Config ---------------------------- */
 
 #define USB_CFG_IOPORTNAME      D
@@ -122,7 +120,7 @@
  * communicates power requirements in units of 2 mA.]
  */
 //XXX: Dual Strike defines this, but usbFunctionWrite() simply returns -1 for XBOX
-#define USB_CFG_IMPLEMENT_FN_WRITE      1
+#define USB_CFG_IMPLEMENT_FN_WRITE      0
 /* Set this to 1 if you want usbFunctionWrite() to be called for control-out
  * transfers. Set it to 0 if you don't need it and want to save a couple of
  * bytes.
@@ -352,7 +350,7 @@
 #define USB_CFG_DESCR_PROPS_STRINGS                 0
 #define USB_CFG_DESCR_PROPS_STRING_0                0
 #define USB_CFG_DESCR_PROPS_STRING_VENDOR           0
-#define USB_CFG_DESCR_PROPS_STRING_PRODUCT          USB_PROP_LENGTH(22)
+#define USB_CFG_DESCR_PROPS_STRING_PRODUCT          0
 #define USB_CFG_DESCR_PROPS_STRING_SERIAL_NUMBER    0
 #define USB_CFG_DESCR_PROPS_HID                     0
 #define USB_CFG_DESCR_PROPS_HID_REPORT              0
