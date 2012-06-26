@@ -18,7 +18,7 @@
 
 #include <WProgram.h>
 #include "XBOXPad.h"
-#include "../PS2X_lib.h"
+#include "../PS2Pad.h"
 #include "../genesis.h"
 #include "../saturn.h"
 #include "../NESPad.h"
@@ -252,51 +252,50 @@ void snes_loop() {
 }
 
 void ps2_loop() {
-	PS2X psPad;
 	byte dir = 0;
 
-	while (psPad.config_gamepad(8, 6, 7, 5, false, false) == 1) {
+	while (PS2Pad::init()) {
 		delayMicroseconds(10000); // 10ms delay
 		xbox_send_pad_state();
 	}
 
 	for (;;) {
 
-		psPad.read_gamepad();
+		PS2Pad::read();
 
-		if(psPad.readType() == 0) { // Digital Pad
+		if(PS2Pad::type() == 0) { // Digital Pad
 			gamepad_state.l_x = 0;
 			gamepad_state.l_y = 0;
 			gamepad_state.r_x = 0;
 			gamepad_state.r_y = 0;
 		} else {
-			gamepad_state.l_x = map(psPad.Analog(PSS_LX), 0, 255, -32768, 32767);
-			gamepad_state.l_y = map(psPad.Analog(PSS_LY), 0, 255, 32767, -32768);
-			gamepad_state.r_x = map(psPad.Analog(PSS_RX), 0, 255, -32768, 32767);
-			gamepad_state.r_y = map(psPad.Analog(PSS_RY), 0, 255, 32767, -32768);
+			gamepad_state.l_x = map(PS2Pad::stick(PSS_LX), 0, 255, -32768, 32767);
+			gamepad_state.l_y = map(PS2Pad::stick(PSS_LY), 0, 255, 32767, -32768);
+			gamepad_state.r_x = map(PS2Pad::stick(PSS_RX), 0, 255, -32768, 32767);
+			gamepad_state.r_y = map(PS2Pad::stick(PSS_RY), 0, 255, 32767, -32768);
 		}
 
 
-		psPad.Button(PSB_PAD_UP)    ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_UP)    : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_UP);
-		psPad.Button(PSB_PAD_DOWN)  ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_DOWN)  : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_DOWN);
-		psPad.Button(PSB_PAD_LEFT)  ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_LEFT)  : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_LEFT);
-		psPad.Button(PSB_PAD_RIGHT) ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_RIGHT) : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_RIGHT);
+		PS2Pad::button(PSB_PAD_UP)    ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_UP)    : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_UP);
+		PS2Pad::button(PSB_PAD_DOWN)  ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_DOWN)  : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_DOWN);
+		PS2Pad::button(PSB_PAD_LEFT)  ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_LEFT)  : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_LEFT);
+		PS2Pad::button(PSB_PAD_RIGHT) ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_RIGHT) : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_RIGHT);
 
-		gamepad_state.x = psPad.Button(PSB_SQUARE) * 0xFF;
-		gamepad_state.y = psPad.Button(PSB_TRIANGLE) * 0xFF;
-		gamepad_state.a = psPad.Button(PSB_CROSS) * 0xFF;
-		gamepad_state.b = psPad.Button(PSB_CIRCLE) * 0xFF;
+		gamepad_state.x = PS2Pad::button(PSB_SQUARE) * 0xFF;
+		gamepad_state.y = PS2Pad::button(PSB_TRIANGLE) * 0xFF;
+		gamepad_state.a = PS2Pad::button(PSB_CROSS) * 0xFF;
+		gamepad_state.b = PS2Pad::button(PSB_CIRCLE) * 0xFF;
 
-		psPad.Button(PSB_START) ? bitSet(gamepad_state.digital_buttons, XBOX_START) : bitClear(gamepad_state.digital_buttons, XBOX_START);
-		psPad.Button(PSB_SELECT) ? bitSet(gamepad_state.digital_buttons, XBOX_BACK) : bitClear(gamepad_state.digital_buttons, XBOX_BACK);
-		psPad.Button(PSB_L3) ? bitSet(gamepad_state.digital_buttons, XBOX_LEFT_STICK) : bitClear(gamepad_state.digital_buttons, XBOX_LEFT_STICK);
-		psPad.Button(PSB_R3) ? bitSet(gamepad_state.digital_buttons, XBOX_RIGHT_STICK) : bitClear(gamepad_state.digital_buttons, XBOX_RIGHT_STICK);
+		PS2Pad::button(PSB_START) ? bitSet(gamepad_state.digital_buttons, XBOX_START) : bitClear(gamepad_state.digital_buttons, XBOX_START);
+		PS2Pad::button(PSB_SELECT) ? bitSet(gamepad_state.digital_buttons, XBOX_BACK) : bitClear(gamepad_state.digital_buttons, XBOX_BACK);
+		PS2Pad::button(PSB_L3) ? bitSet(gamepad_state.digital_buttons, XBOX_LEFT_STICK) : bitClear(gamepad_state.digital_buttons, XBOX_LEFT_STICK);
+		PS2Pad::button(PSB_R3) ? bitSet(gamepad_state.digital_buttons, XBOX_RIGHT_STICK) : bitClear(gamepad_state.digital_buttons, XBOX_RIGHT_STICK);
 
-		gamepad_state.l = psPad.Button(PSB_L2) * 0xFF;
-		gamepad_state.r = psPad.Button(PSB_R2) * 0xFF;
+		gamepad_state.l = PS2Pad::button(PSB_L2) * 0xFF;
+		gamepad_state.r = PS2Pad::button(PSB_R2) * 0xFF;
 
-		gamepad_state.white = psPad.Button(PSB_L1) * 0xFF;
-		gamepad_state.black = psPad.Button(PSB_R1) * 0xFF;
+		gamepad_state.white = PS2Pad::button(PSB_L1) * 0xFF;
+		gamepad_state.black = PS2Pad::button(PSB_R1) * 0xFF;
 
 		xbox_send_pad_state();
 	}

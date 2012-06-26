@@ -18,7 +18,7 @@
 
 #include <WProgram.h>
 #include "USBVirtuaStick.h"
-#include "PS2X_lib.h"
+#include "PS2Pad.h"
 #include "genesis.h"
 #include "saturn.h"
 #include "NESPad.h"
@@ -319,85 +319,82 @@ void snes_loop() {
 }
 
 void ps2_loop() {
-	PS2X psPad;
 	byte dir = 0;
 
-	while (psPad.config_gamepad(8, 6, 7, 5, false, false) == 1) {
+	while (PS2Pad::init()) {
 		delayMicroseconds(10000); // 10ms delay
 		vs_send_pad_state();
 	}
 
-	//psPad.config_gamepad(8, 6, 7, 5, false, false);
-
 	for (;;) {
 		//vs_reset_watchdog();
 
-		psPad.read_gamepad();
+		PS2Pad::read();
 
-		if(psPad.readType() == 0) {
+		if(PS2Pad::type() == 0) {
 			gamepad_state.r_x_axis = 0x80;
 			gamepad_state.r_y_axis = 0x80;
 
-			if(psPad.Button(PSB_PAD_LEFT)) {
+			if(PS2Pad::button(PSB_PAD_LEFT)) {
 				gamepad_state.l_x_axis = 0x00;
-			} else if (psPad.Button(PSB_PAD_RIGHT)) {
+			} else if (PS2Pad::button(PSB_PAD_RIGHT)) {
 				gamepad_state.l_x_axis = 0xFF;
 			} else {
 				gamepad_state.l_x_axis = 0x80;
 			}
 
-			if(psPad.Button(PSB_PAD_UP)) {
+			if(PS2Pad::button(PSB_PAD_UP)) {
 				gamepad_state.l_y_axis = 0x00;
-			} else if (psPad.Button(PSB_PAD_DOWN)) {
+			} else if (PS2Pad::button(PSB_PAD_DOWN)) {
 				gamepad_state.l_y_axis = 0xFF;
 			} else {
 				gamepad_state.l_y_axis = 0x80;
 			}
 
 		} else {
-			gamepad_state.l_x_axis = psPad.Analog(PSS_LX);
-			gamepad_state.l_y_axis = psPad.Analog(PSS_LY);
-			gamepad_state.r_x_axis = psPad.Analog(PSS_RX);
-			gamepad_state.r_y_axis = psPad.Analog(PSS_RY);
+			gamepad_state.l_x_axis = PS2Pad::stick(PSS_LX);
+			gamepad_state.l_y_axis = PS2Pad::stick(PSS_LY);
+			gamepad_state.r_x_axis = PS2Pad::stick(PSS_RX);
+			gamepad_state.r_y_axis = PS2Pad::stick(PSS_RY);
 
-			dir = psPad.Button(PSB_PAD_UP) << 3 | psPad.Button(PSB_PAD_DOWN) << 2 | psPad.Button(PSB_PAD_LEFT) << 1 | psPad.Button(PSB_PAD_RIGHT);
+			dir = PS2Pad::button(PSB_PAD_UP) << 3 | PS2Pad::button(PSB_PAD_DOWN) << 2 | PS2Pad::button(PSB_PAD_LEFT) << 1 | PS2Pad::button(PSB_PAD_RIGHT);
 
 			gamepad_state.direction = pad_dir[dir];
 		}
 
-		gamepad_state.square_btn = psPad.Button(PSB_SQUARE);
+		gamepad_state.square_btn = PS2Pad::button(PSB_SQUARE);
 		gamepad_state.square_axis = (gamepad_state.square_btn ? 0xFF : 0x00);
 
-		gamepad_state.cross_btn = psPad.Button(PSB_CROSS);
+		gamepad_state.cross_btn = PS2Pad::button(PSB_CROSS);
 		gamepad_state.cross_axis = (gamepad_state.cross_btn ? 0xFF : 0x00);
 
-		gamepad_state.circle_btn = psPad.Button(PSB_CIRCLE);
+		gamepad_state.circle_btn = PS2Pad::button(PSB_CIRCLE);
 		gamepad_state.circle_axis = (gamepad_state.circle_btn ? 0xFF : 0x00);
 
-		gamepad_state.l1_btn =psPad.Button(PSB_L1);
+		gamepad_state.l1_btn =PS2Pad::button(PSB_L1);
 		gamepad_state.l1_axis = (gamepad_state.l1_btn ? 0xFF : 0x00);
 
-		gamepad_state.l2_btn =psPad.Button(PSB_L2);
+		gamepad_state.l2_btn =PS2Pad::button(PSB_L2);
 		gamepad_state.l2_axis = (gamepad_state.l2_btn ? 0xFF : 0x00);
 
-		gamepad_state.triangle_btn = psPad.Button(PSB_TRIANGLE);
+		gamepad_state.triangle_btn = PS2Pad::button(PSB_TRIANGLE);
 		gamepad_state.triangle_axis = (gamepad_state.triangle_btn ? 0xFF : 0x00);
 
-		gamepad_state.r1_btn = psPad.Button(PSB_R1);
+		gamepad_state.r1_btn = PS2Pad::button(PSB_R1);
 		gamepad_state.r1_axis = (gamepad_state.r1_btn ? 0xFF : 0x00);
 
-		gamepad_state.r2_btn = psPad.Button(PSB_R2);
+		gamepad_state.r2_btn = PS2Pad::button(PSB_R2);
 		gamepad_state.r2_axis = (gamepad_state.r2_btn ? 0xFF : 0x00);
 
-		gamepad_state.l3_btn = psPad.Button(PSB_L3);
+		gamepad_state.l3_btn = PS2Pad::button(PSB_L3);
 
-		gamepad_state.r3_btn = psPad.Button(PSB_R3);
+		gamepad_state.r3_btn = PS2Pad::button(PSB_R3);
 
-		gamepad_state.select_btn = psPad.Button(PSB_SELECT);
+		gamepad_state.select_btn = PS2Pad::button(PSB_SELECT);
 
-		gamepad_state.start_btn = psPad.Button(PSB_START);
+		gamepad_state.start_btn = PS2Pad::button(PSB_START);
 
-		gamepad_state.ps_btn = psPad.Button(PSB_SELECT) && psPad.Button(PSB_START); // SELECT + START = PS Button
+		gamepad_state.ps_btn = PS2Pad::button(PSB_SELECT) && PS2Pad::button(PSB_START); // SELECT + START = PS Button
 
 		vs_send_pad_state();
 	}
