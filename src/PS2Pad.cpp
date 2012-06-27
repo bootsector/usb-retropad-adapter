@@ -103,6 +103,8 @@ int PS2Pad::init() {
 		return 1;
 	}
 
+	PS2Pad::_read_delay = 1;
+
 	for(byte i = 0; i <= 10; i++) {
 
 		// Enter Config Mode
