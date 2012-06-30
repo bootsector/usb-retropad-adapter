@@ -530,7 +530,7 @@ void neogeo_loop() {
 			gamepad_state.l_x_axis = 0xFF; // RIGHT
 		}
 
-		if(button_data & 0x03) {
+		if(button_data & 0x04) {
 			gamepad_state.l_y_axis = 0x00; // UP
 		} else if (button_data & 0x1000) {
 			gamepad_state.l_y_axis = 0xFF; // DOWN
