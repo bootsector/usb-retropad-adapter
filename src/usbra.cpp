@@ -46,6 +46,7 @@
 #define PAD_RESERVED1	0b0000
 // Extended pads (uses DB9 pin 4 for identification)
 #define PAD_SATURN		0b1111
+#define PAD_DFU_DONGLE	0b1110 // Reserved for USBRA DFU dongle
 #define PAD_DO_NOT_USE	0b1100 // 3 LSB overlaps with PS2 pad, which uses DB9 pin 4 for CLK.
 
 // Pad directions vector

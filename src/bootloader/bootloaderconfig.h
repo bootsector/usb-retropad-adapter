@@ -106,13 +106,20 @@ these macros are defined, the boot loader usees them.
 #ifndef __ASSEMBLER__   /* assembler cannot parse function definitions */
 #include <util/delay.h>
 
+
+/*
+ * PB0 - DB9 pin 4
+ * PB3 - DB9 pin 9
+ */
 static inline void  bootLoaderInit(void)
 {
-    PORTD = 1 << 5; /* activate pull-up for key */
+    PORTB = 1 << 0; /* activate pull-up for key */
+    PORTB = 1 << 3; /* activate pull-up for key */
+
     _delay_us(10);  /* wait for levels to stabilize */
 }
 
-#define bootLoaderCondition()   ((PIND & (1 << 5)) == 0)   /* True if jumper is set */
+#define bootLoaderCondition()   ( ((PINB & (1 << 0)) == 0) && ((PINB & (1 << 3)) == 0) )   /* True if jumper is set */
 
 #endif
 
