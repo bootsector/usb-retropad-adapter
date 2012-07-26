@@ -18,6 +18,8 @@
 
 #include "XBOXPad.h"
 
+static int padDetected = 0;
+
 /* ------------------------------------------------------------------------- */
 /* ----------------------------- USB interface ----------------------------- */
 /* ------------------------------------------------------------------------- */
@@ -112,7 +114,7 @@ void xbox_init(bool watchdog) {
 	xbox_reset_pad_status();
 
 	if(watchdog) {
-		wdt_enable(WDTO_1S);
+		wdt_enable(WDTO_2S);
 	} else {
 		wdt_disable();
 	}
@@ -169,6 +171,7 @@ usbMsgLen_t usbFunctionSetup(uchar data[8]) {
 			-wIndex:  0, 0
 			-wLength: 16
 			 */
+			padDetected = 1;
 			usbMsgPtr = (unsigned char*) (gamepad_state.reserved_2);
 			return 16;
 		}
@@ -178,5 +181,9 @@ usbMsgLen_t usbFunctionSetup(uchar data[8]) {
 	}
 
 	return 0; /* default for not implemented requests: return no data back to host */
+}
+
+int xbox_pad_detected() {
+	return padDetected;
 }
 

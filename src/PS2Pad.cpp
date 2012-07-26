@@ -55,6 +55,9 @@ byte PS2Pad::gamepad_spi(byte send_data) {
 }
 
 void PS2Pad::send_command(byte data[], byte size) {
+
+	noInterrupts();
+
 	digitalWriteFast(ATT_PIN, LOW);
 	digitalWriteFast(CMD_PIN, HIGH);
 
@@ -67,6 +70,8 @@ void PS2Pad::send_command(byte data[], byte size) {
 	}
 
 	digitalWriteFast(ATT_PIN, HIGH);
+
+	interrupts();
 
 	delayMicroseconds(PS2Pad::_read_delay * 1000);
 }
@@ -105,7 +110,7 @@ int PS2Pad::init() {
 
 	PS2Pad::_read_delay = 1;
 
-	for(byte i = 0; i <= 10; i++) {
+	for(byte i = 0; i <= 2; i++) {
 
 		// Enter Config Mode
 		byte enter_config_command[] = {0x01, 0x43, 0x00, 0x01, 0x00};

@@ -56,6 +56,7 @@ void xbox_reset_pad_status();
 void xbox_init(bool watchdog);
 void xbox_reset_watchdog();
 void xbox_send_pad_state();
+int xbox_pad_detected();
 
 extern gamepad_state_t gamepad_state;
 

@@ -105,10 +105,11 @@ int detectPad() {
 
 void setup() {
 	// Initialize USB joystick driver
-	xbox_init(false);
+	xbox_init(true);
 
 	// Delay for waiting XBOX pad to be detected...
-	for(int i = 0; i < 100; i++) {
+	while(!xbox_pad_detected()) {
+		xbox_reset_watchdog();
 		delayMicroseconds(10000); // 10ms delay
 		xbox_send_pad_state();
 	}
@@ -120,6 +121,8 @@ void genesis_loop() {
 	genesis_init();
 
 	for (;;) {
+
+		xbox_reset_watchdog();
 
 		button_data = genesis_read();
 
@@ -156,6 +159,8 @@ void arcade_loop() {
 	NESPad::init(6, 7, 13);
 
 	for (;;) {
+
+		xbox_reset_watchdog();
 
 		button_data = NESPad::read(16);
 
@@ -199,6 +204,8 @@ void nes_loop() {
 
 	for (;;) {
 
+		xbox_reset_watchdog();
+
 		button_data = NESPad::read(8);
 
 		(button_data & 16)  ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_UP)    : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_UP);
@@ -226,6 +233,8 @@ void snes_loop() {
 	NESPad::init(5, 6, 7);
 
 	for (;;) {
+
+		xbox_reset_watchdog();
 
 		button_data = NESPad::read(16);
 
@@ -256,11 +265,14 @@ void ps2_loop() {
 	byte dir = 0;
 
 	while (PS2Pad::init()) {
+		xbox_reset_watchdog();
 		delayMicroseconds(10000); // 10ms delay
 		xbox_send_pad_state();
 	}
 
 	for (;;) {
+
+		xbox_reset_watchdog();
 
 		PS2Pad::read();
 
@@ -307,11 +319,14 @@ void gc_loop() {
 	byte dir = 0;
 
 	while(GCPad_init() == 0) {
+		xbox_reset_watchdog();
 		delayMicroseconds(10000); // 10ms delay
 		xbox_send_pad_state();
 	}
 
 	for(;;) {
+
+		xbox_reset_watchdog();
 
 		button_data = GCPad_read();
 
@@ -353,11 +368,14 @@ void n64_loop() {
 	byte lx, ly;
 
 	while(GCPad_init() == 0) {
+		xbox_reset_watchdog();
 		delayMicroseconds(10000); // 10ms delay
 		xbox_send_pad_state();
 	}
 
 	for(;;) {
+
+		xbox_reset_watchdog();
 
 		button_data = N64Pad_read();
 
@@ -412,6 +430,8 @@ void neogeo_loop() {
 
 	for (;;) {
 
+		xbox_reset_watchdog();
+
 		button_data = NESPad::read(16);
 
 		(button_data & 0x04)   ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_UP)    : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_UP);
@@ -443,6 +463,8 @@ void saturn_loop() {
 	saturn_init();
 
 	for (;;) {
+
+		xbox_reset_watchdog();
 
 		button_data = saturn_read();
 
