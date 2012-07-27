@@ -107,7 +107,7 @@ int detectPad() {
 
 void setup() {
 	// Initialize USB joystick driver
-	vs_init(false);
+	vs_init(true);
 }
 
 void genesis_loop() {
@@ -116,7 +116,7 @@ void genesis_loop() {
 	genesis_init();
 
 	for (;;) {
-		//vs_reset_watchdog();
+		vs_reset_watchdog();
 
 		button_data = genesis_read();
 
@@ -169,7 +169,7 @@ void arcade_loop() {
 	NESPad::init(6, 7, 13);
 
 	for (;;) {
-		//vs_reset_watchdog();
+		vs_reset_watchdog();
 
 		button_data = NESPad::read(16);
 
@@ -231,7 +231,7 @@ void nes_loop() {
 	NESPad::init(5, 6, 7);
 
 	for (;;) {
-		//vs_reset_watchdog();
+		vs_reset_watchdog();
 
 		button_data = NESPad::read(8);
 
@@ -272,7 +272,7 @@ void snes_loop() {
 	NESPad::init(5, 6, 7);
 
 	for (;;) {
-		//vs_reset_watchdog();
+		vs_reset_watchdog();
 
 		button_data = NESPad::read(16);
 
@@ -323,12 +323,13 @@ void ps2_loop() {
 	byte dir = 0;
 
 	while (PS2Pad::init()) {
+		vs_reset_watchdog();
 		delayMicroseconds(10000); // 10ms delay
 		vs_send_pad_state();
 	}
 
 	for (;;) {
-		//vs_reset_watchdog();
+		vs_reset_watchdog();
 
 		PS2Pad::read();
 
@@ -406,12 +407,13 @@ void gc_loop() {
 	byte dir = 0;
 
 	while(GCPad_init() == 0) {
+		vs_reset_watchdog();
 		delayMicroseconds(10000); // 10ms delay
 		vs_send_pad_state();
 	}
 
 	for(;;) {
-		//vs_reset_watchdog();
+		vs_reset_watchdog();
 
 		button_data = GCPad_read();
 
@@ -458,12 +460,13 @@ void n64_loop() {
 	byte dir = 0;
 
 	while(GCPad_init() == 0) {
+		vs_reset_watchdog();
 		delayMicroseconds(10000); // 10ms delay
 		vs_send_pad_state();
 	}
 
 	for(;;) {
-		//vs_reset_watchdog();
+		vs_reset_watchdog();
 
 		button_data = N64Pad_read();
 
@@ -518,7 +521,7 @@ void neogeo_loop() {
 	NESPad::init(5, 6, 7);
 
 	for (;;) {
-		//vs_reset_watchdog();
+		vs_reset_watchdog();
 
 		button_data = NESPad::read(16);
 
@@ -565,7 +568,7 @@ void saturn_loop() {
 	saturn_init();
 
 	for (;;) {
-		//vs_reset_watchdog();
+		vs_reset_watchdog();
 
 		button_data = saturn_read();
 

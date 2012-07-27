@@ -111,7 +111,7 @@ void vs_init(bool watchdog) {
 	vs_reset_pad_status();
 
 	if(watchdog) {
-		wdt_enable(WDTO_1S);
+		wdt_enable(WDTO_2S);
 	} else {
 		wdt_disable();
 	}

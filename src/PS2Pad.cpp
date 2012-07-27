@@ -27,7 +27,10 @@ byte PS2Pad::_read_delay = 1;
 byte PS2Pad::gamepad_spi(byte send_data) {
 	byte recv_data = 0;
 
+	noInterrupts();
+
 	for(byte i = 0; i < 8; i++) {
+
 		digitalWriteFast(CLK_PIN, LOW);
 
 		if(send_data & (1 << i)) {
@@ -36,7 +39,11 @@ byte PS2Pad::gamepad_spi(byte send_data) {
 			digitalWriteFast(CMD_PIN, LOW);
 		}
 
+		interrupts();
+
 		delayMicroseconds(CTRL_CLK);
+
+		noInterrupts();
 
 		digitalWriteFast(CLK_PIN, HIGH);
 
@@ -46,6 +53,8 @@ byte PS2Pad::gamepad_spi(byte send_data) {
 
 		delayMicroseconds(CTRL_CLK);
 	}
+
+	interrupts();
 
 	digitalWriteFast(CLK_PIN, HIGH);
 
@@ -63,6 +72,8 @@ void PS2Pad::send_command(byte data[], byte size) {
 
 	digitalWriteFast(CLK_PIN, HIGH);
 
+	interrupts();
+
 	delayMicroseconds(CTRL_BYTE_DELAY*2);
 
 	for(byte i = 0; i < size; i++) {
@@ -70,8 +81,6 @@ void PS2Pad::send_command(byte data[], byte size) {
 	}
 
 	digitalWriteFast(ATT_PIN, HIGH);
-
-	interrupts();
 
 	delayMicroseconds(PS2Pad::_read_delay * 1000);
 }
@@ -99,8 +108,12 @@ int PS2Pad::init() {
 
 	// Init pad
 
+	noInterrupts();
+
 	digitalWriteFast(CLK_PIN, HIGH);
 	digitalWriteFast(CMD_PIN, HIGH);
+
+	interrupts();
 
 	PS2Pad::read();
 
