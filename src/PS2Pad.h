@@ -62,9 +62,10 @@ private:
 	static byte _type;
 	static byte _pad_data[21];
 	static byte _read_delay;
+	static bool _disableInt;
 
 public:
-	static int init();
+	static int init(bool disableInt);
 	static void read();
 	static byte type();
 	static byte button(word button);

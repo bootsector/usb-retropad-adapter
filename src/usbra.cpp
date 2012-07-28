@@ -322,7 +322,7 @@ void snes_loop() {
 void ps2_loop() {
 	byte dir = 0;
 
-	while (PS2Pad::init()) {
+	while (PS2Pad::init(true)) {
 		vs_reset_watchdog();
 		delayMicroseconds(10000); // 10ms delay
 		vs_send_pad_state();
