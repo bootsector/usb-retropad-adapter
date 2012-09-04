@@ -63,6 +63,7 @@ private:
 	static byte _pad_data[21];
 	static byte _read_delay;
 	static bool _disableInt;
+	static bool _analogMode;
 
 public:
 	static int init(bool disableInt);

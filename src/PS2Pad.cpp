@@ -24,6 +24,7 @@ byte PS2Pad::_type;
 byte PS2Pad::_pad_data[21];
 byte PS2Pad::_read_delay = 1;
 bool PS2Pad::_disableInt = false;
+bool PS2Pad::_analogMode = false;
 
 byte PS2Pad::gamepad_spi(byte send_data) {
 	byte recv_data = 0;
@@ -138,8 +139,10 @@ int PS2Pad::init(bool disableInt) {
 
 		PS2Pad::read();
 
-		if(PS2Pad::_pad_data[1] == 0x73)
+		if(PS2Pad::_pad_data[1] == 0x73) {
+			_analogMode = true;
 			break;
+		}
 
 		PS2Pad::_read_delay++;
 	}
@@ -162,7 +165,7 @@ byte PS2Pad::stick(word stick) {
 }
 
 byte PS2Pad::type() {
-	if(PS2Pad::_type == 0x03)
+	if((PS2Pad::_type == 0x03) || PS2Pad::_analogMode)
 		return 1;
 	else if(PS2Pad::_type == 0x01)
 		return 2;
