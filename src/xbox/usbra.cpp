@@ -43,7 +43,7 @@
 #define PAD_GC	 		0b0011
 #define PAD_N64			0b0010
 #define PAD_NEOGEO		0b0001
-#define PAD_RESERVED1	0b0000
+#define PAD_WIICC		0b0000 // Wii Classic Controller - PSX RetroPad Adapter
 // Extended pads (uses DB9 pin 4 for identification)
 #define PAD_SATURN		0b1111
 #define PAD_DFU_DONGLE	0b1110 // Reserved for USBRA DFU dongle
@@ -497,6 +497,10 @@ void saturn_loop() {
 	}
 }
 
+void unsupported_pad(void) {
+	for(;;);
+}
+
 void loop() {
 	switch (detectPad()) {
 	case PAD_ARCADE:
@@ -522,6 +526,9 @@ void loop() {
 		break;
 	case PAD_SATURN:
 		saturn_loop();
+		break;
+	case PAD_WIICC:
+		unsupported_pad();
 		break;
 	default:
 		genesis_loop();
