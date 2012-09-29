@@ -147,7 +147,7 @@ void genesis_loop() {
 
 		(button_data & GENESIS_START) ? bitSet(gamepad_state.digital_buttons, XBOX_START) : bitClear(gamepad_state.digital_buttons, XBOX_START);
 
-		((button_data & GENESIS_UP) && (button_data & GENESIS_START)) ? bitSet(gamepad_state.digital_buttons, XBOX_RIGHT_STICK) : bitClear(gamepad_state.digital_buttons, XBOX_RIGHT_STICK);
+		((button_data & GENESIS_UP) && (button_data & GENESIS_START) && !(button_data & GENESIS_C)) ? bitSet(gamepad_state.digital_buttons, XBOX_RIGHT_STICK) : bitClear(gamepad_state.digital_buttons, XBOX_RIGHT_STICK);
 
 		xbox_send_pad_state();
 	}
