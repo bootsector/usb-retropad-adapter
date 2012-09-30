@@ -68,6 +68,12 @@ int genesis_read() {
 	digitalWriteFast(DB9P7, LOW);
 	delayMicroseconds(DELAY);
 
+	// Is using a SEGA Genesis controller, LEFT and RIGHT will be ACTIVE here
+	if(!(!digitalReadFast(DB9P3) && !digitalReadFast(DB9P4))) {
+		retval = normalbuttons | (extrabuttons << 8);
+		return retval;
+	}
+
 	// Get A and START buttons state
 	normalbuttons |= (!digitalReadFast(DB9P6) << 6);
 	normalbuttons |= (!digitalReadFast(DB9P9) << 7);

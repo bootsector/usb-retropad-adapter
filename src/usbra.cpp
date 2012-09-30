@@ -157,7 +157,7 @@ void genesis_loop() {
 
 		gamepad_state.start_btn = (button_data & GENESIS_START) > 0;
 
-		gamepad_state.ps_btn = (button_data & GENESIS_UP) && (button_data & GENESIS_START) && !(button_data & GENESIS_C);
+		gamepad_state.ps_btn = (button_data & GENESIS_UP) && (button_data & GENESIS_START);
 
 		vs_send_pad_state();
 	}
