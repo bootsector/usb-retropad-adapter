@@ -359,6 +359,8 @@ void gc_loop() {
 		((button_data[1] & 0x08) && (button_data[0] & 0x10)) ? bitSet(gamepad_state.digital_buttons, XBOX_RIGHT_STICK) : bitClear(gamepad_state.digital_buttons, XBOX_RIGHT_STICK);
 
 		xbox_send_pad_state();
+
+		delayMicroseconds(6000);
 	}
 }
 

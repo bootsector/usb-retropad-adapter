@@ -452,6 +452,8 @@ void gc_loop() {
 		gamepad_state.r_y_axis = ~button_data[5];
 
 		vs_send_pad_state();
+
+		delayMicroseconds(6000);
 	}
 }
 
