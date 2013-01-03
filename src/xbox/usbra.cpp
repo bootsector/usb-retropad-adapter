@@ -360,7 +360,7 @@ void gc_loop() {
 
 		xbox_send_pad_state();
 
-		delayMicroseconds(6000);
+		delayMicroseconds(5000);
 	}
 }
 
