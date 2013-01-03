@@ -34,7 +34,7 @@ byte n64_joy_data[4];
  * It was specially crafted to work with an 16Mhz Atmega328/168 (ext. xtal).
  *
  * */
-void GCPad_send(byte *cmd, byte length) {
+static inline void GCPad_send(byte *cmd, byte length) {
 	byte bit = 128;
 	byte high;
 
@@ -122,7 +122,7 @@ void GCPad_send(byte *cmd, byte length) {
  * It was specially crafted to work with a 16Mhz Atmega328/168 (ext. xtal).
  *
  * */
-void GCPad_recv(byte *buffer, byte bits) {
+static inline void GCPad_recv(byte *buffer, byte bits) {
 
 	pinModeFast(JOY_DATA_PIN, INPUT);
 	digitalWriteFast(JOY_DATA_PIN, HIGH);
@@ -132,14 +132,24 @@ void GCPad_recv(byte *buffer, byte bits) {
 	while(PIND & 0x20);
 
 
+//	asm volatile (
+//			"nop\nnop\nnop\nnop\nnop\nnop\nnop\nnop\n"
+//			"nop\nnop\nnop\nnop\nnop\n"
+//	);
+//
+//	asm volatile (
+//			"nop\nnop\nnop\nnop\nnop\nnop\nnop\nnop\n"
+//			"nop\nnop\nnop\nnop\nnop\n"
+//	);
+
 	asm volatile (
 			"nop\nnop\nnop\nnop\nnop\nnop\nnop\nnop\n"
-			"nop\nnop\nnop\nnop\nnop\n"
+			"nop\nnop\nnop\nnop\n"
 	);
 
 	asm volatile (
 			"nop\nnop\nnop\nnop\nnop\nnop\nnop\nnop\n"
-			"nop\nnop\nnop\nnop\nnop\n"
+			"nop\nnop\nnop\nnop\n"
 	);
 
 	*buffer = PIND & 0x20; //*buffer = digitalReadFast(JOY_DATA_PIN);
