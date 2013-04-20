@@ -23,31 +23,33 @@
 #include "../saturn.h"
 #include "../NESPad.h"
 #include "../GCPad_16Mhz.h"
+#include "../tg16.h"
 
 // Arcade mode detection pin
 #define ARCADE_DB9_PIN	12
 
 // Extension cable detection pins
-#define DETPIN0	8
-#define DETPIN1	9
-#define DETPIN2	10
-#define DETPIN3	11
+#define DETPIN0 6  // DB9P2
+#define DETPIN1	8  // DB9P4
+#define DETPIN2	9  // DB9P6
+#define DETPIN3	10 // DB9P7
+#define DETPIN4	11 // DB9P9
 
 // Possible values (as of today) returned by the detectPad() routine
 // Normal pads
 #define PAD_ARCADE		-1
-#define PAD_GENESIS		0b0111
-#define PAD_NES 		0b0110
-#define PAD_SNES 		0b0101
-#define PAD_PS2 		0b0100
-#define PAD_GC	 		0b0011
-#define PAD_N64			0b0010
-#define PAD_NEOGEO		0b0001
-#define PAD_WIICC		0b0000 // Wii Classic Controller - PSX RetroPad Adapter
-// Extended pads (uses DB9 pin 4 for identification)
-#define PAD_SATURN		0b1111
-#define PAD_DFU_DONGLE	0b1110 // Reserved for USBRA DFU dongle
-#define PAD_DO_NOT_USE	0b1100 // 3 LSB overlaps with PS2 pad, which uses DB9 pin 4 for CLK.
+#define PAD_GENESIS		0b00111
+#define PAD_NES 		0b00110
+#define PAD_SNES 		0b00101
+#define PAD_PS2 		0b00100
+#define PAD_GC	 		0b00011
+#define PAD_N64			0b00010
+#define PAD_NEOGEO		0b00001
+#define PAD_WIICC		0b00000
+// Extended pads (uses DB9 pin 4 and/or 2 for identification)
+#define PAD_SATURN		0b01111
+#define PAD_TG16		0b10111
+#define PAD_DFU_DONGLE	0b01110 // Reserved for USBRA DFU dongle
 
 /*
  * This is the new auto-detect function (non jumper based) which detects the extension
@@ -55,20 +57,22 @@
  * the detection.
  *
  *  -1 - Arcade
- * 0111 - Sega Genesis (Default)
- * 0110 - NES
- * 0101 - SNES
- * 0100 - PS2
- * 0011 - Game Cube
- * 0010 - Nintendo 64
- * 0001 - Neo Geo
- * 0000 - Reserved 1
- * 1111 - Sega Saturn
+ * 00111 - Sega Genesis (Default)
+ * 00110 - NES
+ * 00101 - SNES
+ * 00100 - PS2
+ * 00011 - Game Cube
+ * 00010 - Nintendo 64
+ * 00001 - Neo Geo
+ * 00000 - Reserved 1
+ * 01111 - Sega Saturn
+ * 10111 - TurboGrafx 16
  */
 int detectPad() {
-	int pad;
-
 	// Set pad/arcade detection pins as input, turning pull-ups on
+	pinMode(DETPIN0, INPUT);
+	digitalWrite(DETPIN0, HIGH);
+
 	pinMode(DETPIN1, INPUT);
 	digitalWrite(DETPIN1, HIGH);
 
@@ -78,6 +82,9 @@ int detectPad() {
 	pinMode(DETPIN3, INPUT);
 	digitalWrite(DETPIN3, HIGH);
 
+	pinMode(DETPIN4, INPUT);
+	digitalWrite(DETPIN3, HIGH);
+
 	pinMode(ARCADE_DB9_PIN, INPUT);
 	digitalWrite(ARCADE_DB9_PIN, HIGH);
 
@@ -85,21 +92,13 @@ int detectPad() {
 	if(digitalRead(ARCADE_DB9_PIN))
 		return PAD_ARCADE;
 
-	// Read extension detection pins statuses
-	pad = (digitalRead(DETPIN1) << 2) | (digitalRead(DETPIN2) << 1) | (digitalRead(DETPIN3));
-
-	// Check if pad is not PS2 pad, that uses DB9 pin 4.
-	// If not, then use pin 4 for additional pads
-	if(pad != PAD_PS2) {
-		pinMode(DETPIN0, INPUT);
-		digitalWrite(DETPIN0, HIGH);
-
-		pad |= ((!digitalRead(DETPIN0)) << 3);
-
-		digitalWrite(DETPIN0, LOW);
+	if(!digitalRead(DETPIN0)) {
+		return PAD_TG16;
+	} else if(!digitalRead(DETPIN1)) {
+		return PAD_SATURN;
+	} else {
+		return (digitalRead(DETPIN2) << 2) | (digitalRead(DETPIN3) << 1) | (digitalRead(DETPIN4));
 	}
-
-	return pad;
 }
 
 
@@ -499,6 +498,36 @@ void saturn_loop() {
 	}
 }
 
+void tg16_loop(void) {
+	int button_data;
+
+	tg16_init();
+
+	for (;;) {
+		xbox_reset_watchdog();
+
+		button_data = tg16_read();
+
+		(button_data & (1 << TG16_UP))    ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_UP)    : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_UP);
+		(button_data & (1 << TG16_DOWN))  ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_DOWN)  : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_DOWN);
+		(button_data & (1 << TG16_LEFT))  ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_LEFT)  : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_LEFT);
+		(button_data & (1 << TG16_RIGHT)) ? bitSet(gamepad_state.digital_buttons, XBOX_DPAD_RIGHT) : bitClear(gamepad_state.digital_buttons, XBOX_DPAD_RIGHT);
+
+		gamepad_state.a = ((button_data & (1 << TG16_I)) > 0) * 0xFF;
+
+		gamepad_state.x = ((button_data & (1 << TG16_II)) > 0) * 0xFF;
+
+		(button_data & (1 << TG16_RUN)) ? bitSet(gamepad_state.digital_buttons, XBOX_START) : bitClear(gamepad_state.digital_buttons, XBOX_START);
+
+		(button_data & (1 << TG16_SELECT)) ? bitSet(gamepad_state.digital_buttons, XBOX_BACK) : bitClear(gamepad_state.digital_buttons, XBOX_BACK);
+
+		((button_data & (1 << TG16_RUN)) && (button_data & (1 << TG16_SELECT))) ? bitSet(gamepad_state.digital_buttons, XBOX_RIGHT_STICK) : bitClear(gamepad_state.digital_buttons, XBOX_RIGHT_STICK);
+
+		xbox_send_pad_state();
+	}
+}
+
+
 void unsupported_pad(void) {
 	for(;;);
 }
@@ -528,6 +557,9 @@ void loop() {
 		break;
 	case PAD_SATURN:
 		saturn_loop();
+		break;
+	case PAD_TG16:
+		tg16_loop();
 		break;
 	case PAD_WIICC:
 		unsupported_pad();
