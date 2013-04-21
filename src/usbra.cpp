@@ -89,7 +89,7 @@ int detectPad() {
 	digitalWrite(DETPIN3, HIGH);
 
 	pinMode(DETPIN4, INPUT);
-	digitalWrite(DETPIN3, HIGH);
+	digitalWrite(DETPIN4, HIGH);
 
 	pinMode(ARCADE_DB9_PIN, INPUT);
 	digitalWrite(ARCADE_DB9_PIN, HIGH);
