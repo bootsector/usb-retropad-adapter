@@ -73,6 +73,8 @@ byte pad_dir[16] = {8, 2, 6, 8, 4, 3, 5, 8, 0, 1, 7, 8, 8, 8, 8, 8};
  * 10111 - TurboGrafx 16
  */
 int detectPad() {
+	int pad;
+
 	// Set pad/arcade detection pins as input, turning pull-ups on
 	pinMode(DETPIN0, INPUT);
 	digitalWrite(DETPIN0, HIGH);
@@ -96,13 +98,28 @@ int detectPad() {
 	if(digitalRead(ARCADE_DB9_PIN))
 		return PAD_ARCADE;
 
-	if(!digitalRead(DETPIN0)) {
-		return PAD_TG16;
-	} else if(!digitalRead(DETPIN1)) {
-		return PAD_SATURN;
-	} else {
-		return (digitalRead(DETPIN2) << 2) | (digitalRead(DETPIN3) << 1) | (digitalRead(DETPIN4));
+	pad = (!digitalRead(DETPIN0) << 4) | (!digitalRead(DETPIN1) << 3) | (digitalRead(DETPIN2) << 2) | (digitalRead(DETPIN3) << 1) | (digitalRead(DETPIN4));
+
+	if((pad >> 3) & 0b11) {
+		switch(pad) {
+		case 0b11011:
+		case 0b10111:
+			return PAD_TG16;
+			break;
+		case 0b11111:
+		case 0b01111:
+			return PAD_SATURN;
+			break;
+		case 0b11100:
+			return PAD_PS2;
+			break;
+		default:
+			return PAD_GENESIS;
+			break;
+		}
 	}
+
+	return (pad & 0b111);
 }
 
 void setup() {
