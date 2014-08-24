@@ -286,10 +286,10 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB) $(EXTRA_LIBS)
 # to get a full listing.
 #
 AVRDUDE_PROGRAMMER = stk500v1
-AVRDUDE_CONFIG = "D:\Arquivos de Programas\arduino-0022\hardware\tools\avr\etc\avrdude.conf"
+AVRDUDE_CONFIG = "/Applications/Arduino105.app/Contents/Resources/Java/hardware/tools/avr/etc/avrdude.conf"
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
-AVRDUDE_PORT = //./COM6    # programmer connected to serial device
+AVRDUDE_PORT = /dev/tty.usbmodem12341    # programmer connected to serial device
 AVRDUDE_BAUD = 19200   # serial device baud rate
 
 # Fuses config
