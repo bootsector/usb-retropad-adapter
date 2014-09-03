@@ -63,6 +63,7 @@ typedef struct {
 	uint8_t l_y_axis;
 	uint8_t r_x_axis;
 	uint8_t r_y_axis;
+	uint8_t slider;
 
 	uint8_t unknown[4];
 

@@ -468,6 +468,8 @@ void gc_loop() {
 		gamepad_state.r_x_axis = button_data[4];
 		gamepad_state.r_y_axis = ~button_data[5];
 
+		gamepad_state.slider = 0x80 - (button_data[6] >> 1) + (button_data[7] >> 1);
+
 		vs_send_pad_state();
 
 		delayMicroseconds(5000);

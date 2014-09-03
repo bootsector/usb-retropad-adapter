@@ -22,7 +22,7 @@
 /* ----------------------------- USB interface ----------------------------- */
 /* ------------------------------------------------------------------------- */
 
-PROGMEM char usbHidReportDescriptor[112] = { /* USB report descriptor, size must match usbconfig.h */
+PROGMEM char usbHidReportDescriptor[114] = { /* USB report descriptor, size must match usbconfig.h */
 0x05, 0x01, // USAGE_PAGE (Generic Desktop)
 		0x09, 0x05, // USAGE (Gamepad)
 		0xa1, 0x01, // COLLECTION (Application)
@@ -55,8 +55,9 @@ PROGMEM char usbHidReportDescriptor[112] = { /* USB report descriptor, size must
 		0x09, 0x31, //   USAGE (Y)
 		0x09, 0x32, //   USAGE (Z)
 		0x09, 0x35, //   USAGE (Rz)
+		0x09, 0x36,	//	 USAGE (Slider)
 		0x75, 0x08, //   REPORT_SIZE (8)
-		0x95, 0x04, //   REPORT_COUNT (4)
+		0x95, 0x05, //   REPORT_COUNT (5)
 		0x81, 0x02, //   INPUT (Data,Var,Abs)
 		0x06, 0x00, 0xff, //   USAGE_PAGE (Vendor Specific)
 		0x09, 0x20, //   Unknown
@@ -93,6 +94,7 @@ void vs_reset_pad_status() {
 	gamepad_state.l_y_axis = 0x80;
 	gamepad_state.r_x_axis = 0x80;
 	gamepad_state.r_y_axis = 0x80;
+	gamepad_state.slider = 0x80;
 }
 
 void vs_init(bool watchdog) {
@@ -147,7 +149,7 @@ void vs_send_pad_state() {
 	usbSetInterrupt((unsigned char *) &gamepad_state + 8, 8);
 	while (!usbInterruptIsReady())
 		usbPoll();
-	usbSetInterrupt((unsigned char *) &gamepad_state + 16, 3);
+	usbSetInterrupt((unsigned char *) &gamepad_state + 16, 4);
 }
 
 usbMsgLen_t usbFunctionSetup(uchar data[8]) {
