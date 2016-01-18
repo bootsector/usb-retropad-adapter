@@ -463,10 +463,10 @@ void gc_loop() {
 
 		gamepad_state.ps_btn = (button_data[1] & 0x08) && (button_data[0] & 0x10); // UP + START = PS button
 
-		gamepad_state.l_x_axis = button_data[2];
-		gamepad_state.l_y_axis = ~button_data[3];
-		gamepad_state.r_x_axis = button_data[4];
-		gamepad_state.r_y_axis = ~button_data[5];
+		gamepad_state.l_x_axis = map(button_data[2], 32, 223, 0, 255);
+		gamepad_state.l_y_axis = map((byte)~button_data[3], 32, 223, 0, 255);
+		gamepad_state.r_x_axis = map(button_data[4], 32, 223, 0, 255);
+		gamepad_state.r_y_axis = map((byte)~button_data[5], 32, 223, 0, 255);
 
 		gamepad_state.slider = 0x80 - (button_data[6] >> 1) + (button_data[7] >> 1);
 
@@ -516,6 +516,10 @@ void n64_loop() {
 
 		gamepad_state.l_x_axis = ((button_data[2] >= 128) ? button_data[2] - 128 : button_data[2] + 128);
 		gamepad_state.l_y_axis = ~((button_data[3] >= 128) ? button_data[3] - 128 : button_data[3] + 128);
+
+		// Fix analog logical data since N64 pad doesn't use the full range
+		gamepad_state.l_x_axis = map(gamepad_state.l_x_axis, 32, 223, 0, 255);
+		gamepad_state.l_y_axis = map(gamepad_state.l_y_axis, 32, 223, 0, 255);
 
 		gamepad_state.r_x_axis = 0x80;
 		gamepad_state.r_y_axis = 0x80;

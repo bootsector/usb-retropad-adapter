@@ -2,7 +2,7 @@
    1               	/* Name: usbdrvasm.S
    0               	
    0               	
-   2               	* Project: V-USB, virtual USB port for Atmel's(r) AVR(r) microcontrollers
+   2               	 * Project: V-USB, virtual USB port for Atmel's(r) AVR(r) microcontrollers
    3               	 * Author: Christian Starkjohann
    4               	 * Creation Date: 2007-06-13
    5               	 * Tabsize: 4
@@ -493,8 +493,8 @@
  344               	#include <avr/lock.h>
    1               	/* Copyright (c) 2007, Atmel Corporation
  345               	
- 122               	avr/pgmspace.h>
-  20               	"         /* for common defs */
+ 122               	#ifdef __ASSEMBLER__
+  20               	#include "usbdrv.h"         /* for common defs */
    1               	/* Name: usbdrv.h
    2               	 * Project: V-USB, virtual USB port for Atmel's(r) AVR(r) microcontrollers
    3               	 * Author: Christian Starkjohann
@@ -509,371 +509,371 @@
   12               	#define __usbdrv_h_included__
   13               	#include "usbconfig.h"
    1               	/*
-  14               	portability.h"
-  21               	/* register names */
-  22               	#define x1      r16
-  23               	#define x2      r17
-  24               	#define shift   r18
-  25               	#define cnt     r19
-  26               	#define x3      r20
-  27               	#define x4      r21
-  28               	#define x5		r22
-  29               	#define bitcnt  x5
-  30               	#define phase   x4
-  31               	#define leap    x4
-  32               	
-  33               	/* Some assembler dependent definitions and declarations: */
-  34               	
-  35               	#ifdef __IAR_SYSTEMS_ASM__
-  36               	    extern  usbRxBuf, usbDeviceAddr, usbNewDeviceAddr, usbInputBufOffset
-  37               	    extern  usbCurrentTok, usbRxLen, usbRxToken, usbTxLen
-  38               	    extern  usbTxBuf, usbTxStatus1, usbTxStatus3
-  39               	#   if USB_COUNT_SOF
-  40               	        extern usbSofCount
-  41               	#   endif
-  42               	    public  usbCrc16
-  43               	    public  usbCrc16Append
-  44               	
-  45               	    COMMON  INTVEC
-  46               	#   ifndef USB_INTR_VECTOR
-  47               	        ORG     INT0_vect
-  48               	#   else /* USB_INTR_VECTOR */
-  49               	        ORG     USB_INTR_VECTOR
-  50               	#       undef   USB_INTR_VECTOR
-  51               	#   endif /* USB_INTR_VECTOR */
-  52               	#   define  USB_INTR_VECTOR usbInterruptHandler
-  53               	    rjmp    USB_INTR_VECTOR
-  54               	    RSEG    CODE
-  55               	
-  56               	#else /* __IAR_SYSTEMS_ASM__ */
-  57               	
-  58               	#   ifndef USB_INTR_VECTOR /* default to hardware interrupt INT0 */
-  59               	#       ifdef INT0_vect
-  60               	#           define USB_INTR_VECTOR  INT0_vect       // this is the "new" define for the vector
-  61               	#       else
-  62               	#           define USB_INTR_VECTOR  SIG_INTERRUPT0  // this is the "old" vector
-  63               	#       endif
-  64               	#   endif
-  65               	    .text
-  66               	    .global USB_INTR_VECTOR
-  68               	    .global usbCrc16
-  69               	    .global usbCrc16Append
-  70               	#endif /* __IAR_SYSTEMS_ASM__ */
-  71               	
+  14               	#include "usbportability.h"
+  21               	
+  22               	/* register names */
+  23               	#define x1      r16
+  24               	#define x2      r17
+  25               	#define shift   r18
+  26               	#define cnt     r19
+  27               	#define x3      r20
+  28               	#define x4      r21
+  29               	#define x5		r22
+  30               	#define bitcnt  x5
+  31               	#define phase   x4
+  32               	#define leap    x4
+  33               	
+  34               	/* Some assembler dependent definitions and declarations: */
+  35               	
+  36               	#ifdef __IAR_SYSTEMS_ASM__
+  37               	    extern  usbRxBuf, usbDeviceAddr, usbNewDeviceAddr, usbInputBufOffset
+  38               	    extern  usbCurrentTok, usbRxLen, usbRxToken, usbTxLen
+  39               	    extern  usbTxBuf, usbTxStatus1, usbTxStatus3
+  40               	#   if USB_COUNT_SOF
+  41               	        extern usbSofCount
+  42               	#   endif
+  43               	    public  usbCrc16
+  44               	    public  usbCrc16Append
+  45               	
+  46               	    COMMON  INTVEC
+  47               	#   ifndef USB_INTR_VECTOR
+  48               	        ORG     INT0_vect
+  49               	#   else /* USB_INTR_VECTOR */
+  50               	        ORG     USB_INTR_VECTOR
+  51               	#       undef   USB_INTR_VECTOR
+  52               	#   endif /* USB_INTR_VECTOR */
+  53               	#   define  USB_INTR_VECTOR usbInterruptHandler
+  54               	    rjmp    USB_INTR_VECTOR
+  55               	    RSEG    CODE
+  56               	
+  57               	#else /* __IAR_SYSTEMS_ASM__ */
+  58               	
+  59               	#   ifndef USB_INTR_VECTOR /* default to hardware interrupt INT0 */
+  60               	#       ifdef INT0_vect
+  61               	#           define USB_INTR_VECTOR  INT0_vect       // this is the "new" define for the vector
+  62               	#       else
+  63               	#           define USB_INTR_VECTOR  SIG_INTERRUPT0  // this is the "old" vector
+  64               	#       endif
+  65               	#   endif
+  66               	    .text
+  67               	    .global USB_INTR_VECTOR
+  69               	    .global usbCrc16
+  70               	    .global usbCrc16Append
+  71               	#endif /* __IAR_SYSTEMS_ASM__ */
   72               	
-  73               	#if USB_INTR_PENDING < 0x40 /* This is an I/O address, use in and out */
-  74               	#   define  USB_LOAD_PENDING(reg)   in reg, USB_INTR_PENDING
-  75               	#   define  USB_STORE_PENDING(reg)  out USB_INTR_PENDING, reg
-  76               	#else   /* It's a memory address, use lds and sts */
-  77               	#   define  USB_LOAD_PENDING(reg)   lds reg, USB_INTR_PENDING
-  78               	#   define  USB_STORE_PENDING(reg)  sts USB_INTR_PENDING, reg
-  79               	#endif
-  80               	
-  81               	#define usbTxLen1   usbTxStatus1
-  82               	#define usbTxBuf1   (usbTxStatus1 + 1)
-  83               	#define usbTxLen3   usbTxStatus3
-  84               	#define usbTxBuf3   (usbTxStatus3 + 1)
-  85               	
+  73               	
+  74               	#if USB_INTR_PENDING < 0x40 /* This is an I/O address, use in and out */
+  75               	#   define  USB_LOAD_PENDING(reg)   in reg, USB_INTR_PENDING
+  76               	#   define  USB_STORE_PENDING(reg)  out USB_INTR_PENDING, reg
+  77               	#else   /* It's a memory address, use lds and sts */
+  78               	#   define  USB_LOAD_PENDING(reg)   lds reg, USB_INTR_PENDING
+  79               	#   define  USB_STORE_PENDING(reg)  sts USB_INTR_PENDING, reg
+  80               	#endif
+  81               	
+  82               	#define usbTxLen1   usbTxStatus1
+  83               	#define usbTxBuf1   (usbTxStatus1 + 1)
+  84               	#define usbTxLen3   usbTxStatus3
+  85               	#define usbTxBuf3   (usbTxStatus3 + 1)
   86               	
-  87               	;----------------------------------------------------------------------------
-  88               	; Utility functions
-  89               	;----------------------------------------------------------------------------
-  90               	
-  91               	#ifdef __IAR_SYSTEMS_ASM__
-  92               	/* Register assignments for usbCrc16 on IAR cc */
-  93               	/* Calling conventions on IAR:
-  94               	 * First parameter passed in r16/r17, second in r18/r19 and so on.
-  95               	 * Callee must preserve r4-r15, r24-r29 (r28/r29 is frame pointer)
-  96               	 * Result is passed in r16/r17
-  97               	 * In case of the "tiny" memory model, pointers are only 8 bit with no
-  98               	 * padding. We therefore pass argument 1 as "16 bit unsigned".
-  99               	 */
- 100               	RTMODEL "__rt_version", "3"
- 101               	/* The line above will generate an error if cc calling conventions change.
- 102               	 * The value "3" above is valid for IAR 4.10B/W32
- 103               	 */
- 104               	#   define argLen   r18 /* argument 2 */
- 105               	#   define argPtrL  r16 /* argument 1 */
- 106               	#   define argPtrH  r17 /* argument 1 */
- 107               	
- 108               	#   define resCrcL  r16 /* result */
- 109               	#   define resCrcH  r17 /* result */
- 110               	
- 111               	#   define ptrL     ZL
- 112               	#   define ptrH     ZH
- 113               	#   define ptr      Z
- 114               	#   define byte     r22
- 115               	#   define bitCnt   r19
- 116               	#   define polyL    r20
- 117               	#   define polyH    r21
- 118               	#   define scratch  r23
- 119               	
- 120               	#else  /* __IAR_SYSTEMS_ASM__ */ 
- 121               	/* Register assignments for usbCrc16 on gcc */
- 122               	/* Calling conventions on gcc:
- 123               	 * First parameter passed in r24/r25, second in r22/23 and so on.
- 124               	 * Callee must preserve r1-r17, r28/r29
- 125               	 * Result is passed in r24/r25
- 126               	 */
- 127               	#   define argLen   r22 /* argument 2 */
- 128               	#   define argPtrL  r24 /* argument 1 */
- 129               	#   define argPtrH  r25 /* argument 1 */
- 130               	
- 131               	#   define resCrcL  r24 /* result */
- 132               	#   define resCrcH  r25 /* result */
- 133               	
- 134               	#   define ptrL     XL
- 135               	#   define ptrH     XH
- 136               	#   define ptr      x
- 137               	#   define byte     r18
- 138               	#   define bitCnt   r19
- 139               	#   define polyL    r20
- 140               	#   define polyH    r21
- 141               	#   define scratch  r23
- 142               	
- 143               	#endif
- 144               	
- 145               	#if USB_USE_FAST_CRC
- 146               	
- 147               	; This implementation is faster, but has bigger code size
- 148               	; Thanks to Slawomir Fras (BoskiDialer) for this code!
- 149               	; It implements the following C pseudo-code:
- 150               	; unsigned table(unsigned char x)
- 151               	; {
- 152               	; unsigned    value;
- 153               	; 
- 154               	;     value = (unsigned)x << 6;
- 155               	;     value ^= (unsigned)x << 7;
- 156               	;     if(parity(x))
- 157               	;         value ^= 0xc001;
- 158               	;     return value;
- 159               	; }
- 160               	; unsigned usbCrc16(unsigned char *argPtr, unsigned char argLen)
- 161               	; {
- 162               	; unsigned crc = 0xffff;
- 163               	; 
- 164               	;     while(argLen--)
- 165               	;         crc = table(lo8(crc) ^ *argPtr++) ^ hi8(crc);
- 166               	;     return ~crc;
- 167               	; }
- 168               	
- 169               	; extern unsigned usbCrc16(unsigned char *argPtr, unsigned char argLen);
- 170               	;   argPtr  r24+25 / r16+r17
- 171               	;   argLen  r22 / r18
- 172               	; temp variables:
- 173               	;   byte    r18 / r22
- 174               	;   scratch r23
- 175               	;   resCrc  r24+r25 / r16+r17
- 176               	;   ptr     X / Z
- 177               	usbCrc16:
- 178               	    mov     ptrL, argPtrL
- 179               	    mov     ptrH, argPtrH
- 180               	    ldi     resCrcL, 0xFF
- 181               	    ldi     resCrcH, 0xFF
- 182               	    rjmp    usbCrc16LoopTest
- 183               	usbCrc16ByteLoop:
- 184               	    ld      byte, ptr+
- 185               	    eor     resCrcL, byte   ; resCrcL is now 'x' in table()
- 186               	    mov     byte, resCrcL   ; compute parity of 'x'
- 187               	    swap    byte
- 188               	    eor     byte, resCrcL
- 189               	    mov     scratch, byte
- 190               	    lsr     byte
+  87               	
+  88               	;----------------------------------------------------------------------------
+  89               	; Utility functions
+  90               	;----------------------------------------------------------------------------
+  91               	
+  92               	#ifdef __IAR_SYSTEMS_ASM__
+  93               	/* Register assignments for usbCrc16 on IAR cc */
+  94               	/* Calling conventions on IAR:
+  95               	 * First parameter passed in r16/r17, second in r18/r19 and so on.
+  96               	 * Callee must preserve r4-r15, r24-r29 (r28/r29 is frame pointer)
+  97               	 * Result is passed in r16/r17
+  98               	 * In case of the "tiny" memory model, pointers are only 8 bit with no
+  99               	 * padding. We therefore pass argument 1 as "16 bit unsigned".
+ 100               	 */
+ 101               	RTMODEL "__rt_version", "3"
+ 102               	/* The line above will generate an error if cc calling conventions change.
+ 103               	 * The value "3" above is valid for IAR 4.10B/W32
+ 104               	 */
+ 105               	#   define argLen   r18 /* argument 2 */
+ 106               	#   define argPtrL  r16 /* argument 1 */
+ 107               	#   define argPtrH  r17 /* argument 1 */
+ 108               	
+ 109               	#   define resCrcL  r16 /* result */
+ 110               	#   define resCrcH  r17 /* result */
+ 111               	
+ 112               	#   define ptrL     ZL
+ 113               	#   define ptrH     ZH
+ 114               	#   define ptr      Z
+ 115               	#   define byte     r22
+ 116               	#   define bitCnt   r19
+ 117               	#   define polyL    r20
+ 118               	#   define polyH    r21
+ 119               	#   define scratch  r23
+ 120               	
+ 121               	#else  /* __IAR_SYSTEMS_ASM__ */ 
+ 122               	/* Register assignments for usbCrc16 on gcc */
+ 123               	/* Calling conventions on gcc:
+ 124               	 * First parameter passed in r24/r25, second in r22/23 and so on.
+ 125               	 * Callee must preserve r1-r17, r28/r29
+ 126               	 * Result is passed in r24/r25
+ 127               	 */
+ 128               	#   define argLen   r22 /* argument 2 */
+ 129               	#   define argPtrL  r24 /* argument 1 */
+ 130               	#   define argPtrH  r25 /* argument 1 */
+ 131               	
+ 132               	#   define resCrcL  r24 /* result */
+ 133               	#   define resCrcH  r25 /* result */
+ 134               	
+ 135               	#   define ptrL     XL
+ 136               	#   define ptrH     XH
+ 137               	#   define ptr      x
+ 138               	#   define byte     r18
+ 139               	#   define bitCnt   r19
+ 140               	#   define polyL    r20
+ 141               	#   define polyH    r21
+ 142               	#   define scratch  r23
+ 143               	
+ 144               	#endif
+ 145               	
+ 146               	#if USB_USE_FAST_CRC
+ 147               	
+ 148               	; This implementation is faster, but has bigger code size
+ 149               	; Thanks to Slawomir Fras (BoskiDialer) for this code!
+ 150               	; It implements the following C pseudo-code:
+ 151               	; unsigned table(unsigned char x)
+ 152               	; {
+ 153               	; unsigned    value;
+ 154               	; 
+ 155               	;     value = (unsigned)x << 6;
+ 156               	;     value ^= (unsigned)x << 7;
+ 157               	;     if(parity(x))
+ 158               	;         value ^= 0xc001;
+ 159               	;     return value;
+ 160               	; }
+ 161               	; unsigned usbCrc16(unsigned char *argPtr, unsigned char argLen)
+ 162               	; {
+ 163               	; unsigned crc = 0xffff;
+ 164               	; 
+ 165               	;     while(argLen--)
+ 166               	;         crc = table(lo8(crc) ^ *argPtr++) ^ hi8(crc);
+ 167               	;     return ~crc;
+ 168               	; }
+ 169               	
+ 170               	; extern unsigned usbCrc16(unsigned char *argPtr, unsigned char argLen);
+ 171               	;   argPtr  r24+25 / r16+r17
+ 172               	;   argLen  r22 / r18
+ 173               	; temp variables:
+ 174               	;   byte    r18 / r22
+ 175               	;   scratch r23
+ 176               	;   resCrc  r24+r25 / r16+r17
+ 177               	;   ptr     X / Z
+ 178               	usbCrc16:
+ 179               	    mov     ptrL, argPtrL
+ 180               	    mov     ptrH, argPtrH
+ 181               	    ldi     resCrcL, 0xFF
+ 182               	    ldi     resCrcH, 0xFF
+ 183               	    rjmp    usbCrc16LoopTest
+ 184               	usbCrc16ByteLoop:
+ 185               	    ld      byte, ptr+
+ 186               	    eor     resCrcL, byte   ; resCrcL is now 'x' in table()
+ 187               	    mov     byte, resCrcL   ; compute parity of 'x'
+ 188               	    swap    byte
+ 189               	    eor     byte, resCrcL
+ 190               	    mov     scratch, byte
  191               	    lsr     byte
- 192               	    eor     byte, scratch
- 193               	    inc     byte
- 194               	    lsr     byte
- 195               	    andi    byte, 1         ; byte is now parity(x)
- 196               	    mov     scratch, resCrcL
- 197               	    mov     resCrcL, resCrcH
- 198               	    eor     resCrcL, byte   ; low byte of if(parity(x)) value ^= 0xc001;
- 199               	    neg     byte
- 200               	    andi    byte, 0xc0
- 201               	    mov     resCrcH, byte   ; high byte of if(parity(x)) value ^= 0xc001;
- 202               	    clr     byte
- 203               	    lsr     scratch
- 204               	    ror     byte
- 205               	    eor     resCrcH, scratch
- 206               	    eor     resCrcL, byte
- 207               	    lsr     scratch
- 208               	    ror     byte
- 209               	    eor     resCrcH, scratch
- 210               	    eor     resCrcL, byte
- 211               	usbCrc16LoopTest:
- 212               	    subi    argLen, 1
- 213               	    brsh    usbCrc16ByteLoop
- 214               	    com     resCrcL
- 215               	    com     resCrcH
- 216               	    ret
- 217               	
- 218               	#else   /* USB_USE_FAST_CRC */
- 219               	
- 220               	; This implementation is slower, but has less code size
- 221               	;
- 222               	; extern unsigned usbCrc16(unsigned char *argPtr, unsigned char argLen);
- 223               	;   argPtr  r24+25 / r16+r17
- 224               	;   argLen  r22 / r18
- 225               	; temp variables:
- 226               	;   byte    r18 / r22
- 227               	;   bitCnt  r19
- 228               	;   poly    r20+r21
- 229               	;   scratch r23
- 230               	;   resCrc  r24+r25 / r16+r17
- 231               	;   ptr     X / Z
- 232               	usbCrc16:
- 233               	    mov     ptrL, argPtrL
- 234:usbdrv/usbdrvasm.S ****     mov     ptrH, argPtrH
- 235:usbdrv/usbdrvasm.S ****     ldi     resCrcL, 0
- 236:usbdrv/usbdrvasm.S ****     ldi     resCrcH, 0
- 237:usbdrv/usbdrvasm.S ****     ldi     polyL, lo8(0xa001)
- 238:usbdrv/usbdrvasm.S ****     ldi     polyH, hi8(0xa001)
- 239:usbdrv/usbdrvasm.S ****     com     argLen      ; argLen = -argLen - 1: modified loop to ensure that carry is set
- 240:usbdrv/usbdrvasm.S ****     ldi     bitCnt, 0   ; loop counter with starnd condition = end condition
- 241:usbdrv/usbdrvasm.S ****     rjmp    usbCrcLoopEntry
- 242:usbdrv/usbdrvasm.S **** usbCrcByteLoop:
- 243               	    ld      byte, ptr+
- 244:usbdrv/usbdrvasm.S ****     eor     resCrcL, byte
- 245:usbdrv/usbdrvasm.S **** usbCrcBitLoop:
- 246               	    ror     resCrcH     ; carry is always set here (see brcs jumps to here)
- 247:usbdrv/usbdrvasm.S ****     ror     resCrcL
- 248:usbdrv/usbdrvasm.S ****     brcs    usbCrcNoXor
- 249:usbdrv/usbdrvasm.S ****     eor     resCrcL, polyL
- 250:usbdrv/usbdrvasm.S ****     eor     resCrcH, polyH
- 251:usbdrv/usbdrvasm.S **** usbCrcNoXor:
- 252               	    subi    bitCnt, 224 ; (8 * 224) % 256 = 0; this loop iterates 8 times
- 253:usbdrv/usbdrvasm.S ****     brcs    usbCrcBitLoop
- 254:usbdrv/usbdrvasm.S **** usbCrcLoopEntry:
- 255               	    subi    argLen, -1
- 256:usbdrv/usbdrvasm.S ****     brcs    usbCrcByteLoop
- 257:usbdrv/usbdrvasm.S **** usbCrcReady:
- 258               	    ret
- 259:usbdrv/usbdrvasm.S **** ; Thanks to Reimar Doeffinger for optimizing this CRC routine!
- 260               	
- 261               	#endif /* USB_USE_FAST_CRC */
- 262               	
- 263               	; extern unsigned usbCrc16Append(unsigned char *data, unsigned char len);
- 264               	usbCrc16Append:
- 265               	    rcall   usbCrc16
- 266:usbdrv/usbdrvasm.S ****     st      ptr+, resCrcL
- 267:usbdrv/usbdrvasm.S ****     st      ptr+, resCrcH
- 268:usbdrv/usbdrvasm.S ****     ret
- 269:usbdrv/usbdrvasm.S **** 
- 270               	#undef argLen
- 271               	#undef argPtrL
- 272               	#undef argPtrH
- 273               	#undef resCrcL
- 274               	#undef resCrcH
- 275               	#undef ptrL
- 276               	#undef ptrH
- 277               	#undef ptr
- 278               	#undef byte
- 279               	#undef bitCnt
- 280               	#undef polyL
- 281               	#undef polyH
- 282               	#undef scratch
- 283               	
+ 192               	    lsr     byte
+ 193               	    eor     byte, scratch
+ 194               	    inc     byte
+ 195               	    lsr     byte
+ 196               	    andi    byte, 1         ; byte is now parity(x)
+ 197               	    mov     scratch, resCrcL
+ 198               	    mov     resCrcL, resCrcH
+ 199               	    eor     resCrcL, byte   ; low byte of if(parity(x)) value ^= 0xc001;
+ 200               	    neg     byte
+ 201               	    andi    byte, 0xc0
+ 202               	    mov     resCrcH, byte   ; high byte of if(parity(x)) value ^= 0xc001;
+ 203               	    clr     byte
+ 204               	    lsr     scratch
+ 205               	    ror     byte
+ 206               	    eor     resCrcH, scratch
+ 207               	    eor     resCrcL, byte
+ 208               	    lsr     scratch
+ 209               	    ror     byte
+ 210               	    eor     resCrcH, scratch
+ 211               	    eor     resCrcL, byte
+ 212               	usbCrc16LoopTest:
+ 213               	    subi    argLen, 1
+ 214               	    brsh    usbCrc16ByteLoop
+ 215               	    com     resCrcL
+ 216               	    com     resCrcH
+ 217               	    ret
+ 218               	
+ 219               	#else   /* USB_USE_FAST_CRC */
+ 220               	
+ 221               	; This implementation is slower, but has less code size
+ 222               	;
+ 223               	; extern unsigned usbCrc16(unsigned char *argPtr, unsigned char argLen);
+ 224               	;   argPtr  r24+25 / r16+r17
+ 225               	;   argLen  r22 / r18
+ 226               	; temp variables:
+ 227               	;   byte    r18 / r22
+ 228               	;   bitCnt  r19
+ 229               	;   poly    r20+r21
+ 230               	;   scratch r23
+ 231               	;   resCrc  r24+r25 / r16+r17
+ 232               	;   ptr     X / Z
+ 233               	usbCrc16:
+ 234:usbdrv/usbdrvasm.S ****     mov     ptrL, argPtrL
+ 235:usbdrv/usbdrvasm.S ****     mov     ptrH, argPtrH
+ 236:usbdrv/usbdrvasm.S ****     ldi     resCrcL, 0
+ 237:usbdrv/usbdrvasm.S ****     ldi     resCrcH, 0
+ 238:usbdrv/usbdrvasm.S ****     ldi     polyL, lo8(0xa001)
+ 239:usbdrv/usbdrvasm.S ****     ldi     polyH, hi8(0xa001)
+ 240:usbdrv/usbdrvasm.S ****     com     argLen      ; argLen = -argLen - 1: modified loop to ensure that carry is set
+ 241:usbdrv/usbdrvasm.S ****     ldi     bitCnt, 0   ; loop counter with starnd condition = end condition
+ 242:usbdrv/usbdrvasm.S ****     rjmp    usbCrcLoopEntry
+ 243               	usbCrcByteLoop:
+ 244:usbdrv/usbdrvasm.S ****     ld      byte, ptr+
+ 245:usbdrv/usbdrvasm.S ****     eor     resCrcL, byte
+ 246               	usbCrcBitLoop:
+ 247:usbdrv/usbdrvasm.S ****     ror     resCrcH     ; carry is always set here (see brcs jumps to here)
+ 248:usbdrv/usbdrvasm.S ****     ror     resCrcL
+ 249:usbdrv/usbdrvasm.S ****     brcs    usbCrcNoXor
+ 250:usbdrv/usbdrvasm.S ****     eor     resCrcL, polyL
+ 251:usbdrv/usbdrvasm.S ****     eor     resCrcH, polyH
+ 252               	usbCrcNoXor:
+ 253:usbdrv/usbdrvasm.S ****     subi    bitCnt, 224 ; (8 * 224) % 256 = 0; this loop iterates 8 times
+ 254:usbdrv/usbdrvasm.S ****     brcs    usbCrcBitLoop
+ 255               	usbCrcLoopEntry:
+ 256:usbdrv/usbdrvasm.S ****     subi    argLen, -1
+ 257:usbdrv/usbdrvasm.S ****     brcs    usbCrcByteLoop
+ 258               	usbCrcReady:
+ 259:usbdrv/usbdrvasm.S ****     ret
+ 260               	; Thanks to Reimar Doeffinger for optimizing this CRC routine!
+ 261               	
+ 262               	#endif /* USB_USE_FAST_CRC */
+ 263               	
+ 264               	; extern unsigned usbCrc16Append(unsigned char *data, unsigned char len);
+ 265               	usbCrc16Append:
+ 266:usbdrv/usbdrvasm.S ****     rcall   usbCrc16
+ 267:usbdrv/usbdrvasm.S ****     st      ptr+, resCrcL
+ 268:usbdrv/usbdrvasm.S ****     st      ptr+, resCrcH
+ 269:usbdrv/usbdrvasm.S ****     ret
+ 270               	
+ 271               	#undef argLen
+ 272               	#undef argPtrL
+ 273               	#undef argPtrH
+ 274               	#undef resCrcL
+ 275               	#undef resCrcH
+ 276               	#undef ptrL
+ 277               	#undef ptrH
+ 278               	#undef ptr
+ 279               	#undef byte
+ 280               	#undef bitCnt
+ 281               	#undef polyL
+ 282               	#undef polyH
+ 283               	#undef scratch
  284               	
- 285               	#if USB_CFG_HAVE_MEASURE_FRAME_LENGTH
- 286               	#ifdef __IAR_SYSTEMS_ASM__
- 287               	/* Register assignments for usbMeasureFrameLength on IAR cc */
- 288               	/* Calling conventions on IAR:
- 289               	 * First parameter passed in r16/r17, second in r18/r19 and so on.
- 290               	 * Callee must preserve r4-r15, r24-r29 (r28/r29 is frame pointer)
- 291               	 * Result is passed in r16/r17
- 292               	 * In case of the "tiny" memory model, pointers are only 8 bit with no
- 293               	 * padding. We therefore pass argument 1 as "16 bit unsigned".
- 294               	 */
- 295               	#   define resL     r16
- 296               	#   define resH     r17
- 297               	#   define cnt16L   r30
- 298               	#   define cnt16H   r31
- 299               	#   define cntH     r18
- 300               	
- 301               	#else  /* __IAR_SYSTEMS_ASM__ */ 
- 302               	/* Register assignments for usbMeasureFrameLength on gcc */
- 303               	/* Calling conventions on gcc:
- 304               	 * First parameter passed in r24/r25, second in r22/23 and so on.
- 305               	 * Callee must preserve r1-r17, r28/r29
- 306               	 * Result is passed in r24/r25
- 307               	 */
- 308               	#   define resL     r24
- 309               	#   define resH     r25
- 310               	#   define cnt16L   r24
- 311               	#   define cnt16H   r25
- 312               	#   define cntH     r26
- 313               	#endif
- 314               	#   define cnt16    cnt16L
- 315               	
- 316               	; extern unsigned usbMeasurePacketLength(void);
- 317               	; returns time between two idle strobes in multiples of 7 CPU clocks
- 318               	.global usbMeasureFrameLength
- 319               	usbMeasureFrameLength:
- 320               	    ldi     cntH, 6         ; wait ~ 10 ms for D- == 0
- 321               	    clr     cnt16L
- 322               	    clr     cnt16H
- 323               	usbMFTime16:
- 324               	    dec     cntH
- 325               	    breq    usbMFTimeout
- 326               	usbMFWaitStrobe:            ; first wait for D- == 0 (idle strobe)
- 327               	    sbiw    cnt16, 1        ;[0] [6]
- 328               	    breq    usbMFTime16     ;[2]
- 329               	    sbic    USBIN, USBMINUS ;[3]
- 330               	    rjmp    usbMFWaitStrobe ;[4]
- 331               	usbMFWaitIdle:              ; then wait until idle again
- 332               	    sbis    USBIN, USBMINUS ;1 wait for D- == 1
- 333               	    rjmp    usbMFWaitIdle   ;2
- 334               	    ldi     cnt16L, 1       ;1 represents cycles so far
- 335               	    clr     cnt16H          ;1
- 336               	usbMFWaitLoop:
- 337               	    in      cntH, USBIN     ;[0] [7]
- 338               	    adiw    cnt16, 1        ;[1]
- 339               	    breq    usbMFTimeout    ;[3]
- 340               	    andi    cntH, USBMASK   ;[4]
- 341               	    brne    usbMFWaitLoop   ;[5]
- 342               	usbMFTimeout:
- 343               	#if resL != cnt16L
- 344               	    mov     resL, cnt16L
- 345               	    mov     resH, cnt16H
- 346               	#endif
- 347               	    ret
- 348               	
- 349               	#undef resL
- 350               	#undef resH
- 351               	#undef cnt16
- 352               	#undef cnt16L
- 353               	#undef cnt16H
- 354               	#undef cntH
- 355               	
- 356               	#endif  /* USB_CFG_HAVE_MEASURE_FRAME_LENGTH */
- 357               	
- 358               	;----------------------------------------------------------------------------
- 359               	; Now include the clock rate specific code
- 360               	;----------------------------------------------------------------------------
- 361               	
- 362               	#ifndef USB_CFG_CLOCK_KHZ
- 363               	#   ifdef F_CPU
- 364               	#       define USB_CFG_CLOCK_KHZ (F_CPU/1000)
- 365               	#   else
- 366               	#       error "USB_CFG_CLOCK_KHZ not defined in usbconfig.h and no F_CPU set!"
- 367               	#   endif
- 368               	#endif
- 369               	
- 370               	#if USB_CFG_CHECK_CRC   /* separate dispatcher for CRC type modules */
- 371               	#   if USB_CFG_CLOCK_KHZ == 18000
- 372               	#       include "usbdrvasm18-crc.inc"
- 373               	#   else
- 374               	#       error "USB_CFG_CLOCK_KHZ is not one of the supported crc-rates!"
- 375               	#   endif
- 376               	#else   /* USB_CFG_CHECK_CRC */
- 377               	#   if USB_CFG_CLOCK_KHZ == 12000
- 378               	#       include "usbdrvasm12.inc"
- 379               	#   elif USB_CFG_CLOCK_KHZ == 12800
- 380               	#       include "usbdrvasm128.inc"
- 381               	#   elif USB_CFG_CLOCK_KHZ == 15000
- 382               	#       include "usbdrvasm15.inc"
- 383               	#   elif USB_CFG_CLOCK_KHZ == 16000
- 384               	#       include "usbdrvasm16.inc"
- 385               	#   elif USB_CFG_CLOCK_KHZ == 16500
+ 285               	
+ 286               	#if USB_CFG_HAVE_MEASURE_FRAME_LENGTH
+ 287               	#ifdef __IAR_SYSTEMS_ASM__
+ 288               	/* Register assignments for usbMeasureFrameLength on IAR cc */
+ 289               	/* Calling conventions on IAR:
+ 290               	 * First parameter passed in r16/r17, second in r18/r19 and so on.
+ 291               	 * Callee must preserve r4-r15, r24-r29 (r28/r29 is frame pointer)
+ 292               	 * Result is passed in r16/r17
+ 293               	 * In case of the "tiny" memory model, pointers are only 8 bit with no
+ 294               	 * padding. We therefore pass argument 1 as "16 bit unsigned".
+ 295               	 */
+ 296               	#   define resL     r16
+ 297               	#   define resH     r17
+ 298               	#   define cnt16L   r30
+ 299               	#   define cnt16H   r31
+ 300               	#   define cntH     r18
+ 301               	
+ 302               	#else  /* __IAR_SYSTEMS_ASM__ */ 
+ 303               	/* Register assignments for usbMeasureFrameLength on gcc */
+ 304               	/* Calling conventions on gcc:
+ 305               	 * First parameter passed in r24/r25, second in r22/23 and so on.
+ 306               	 * Callee must preserve r1-r17, r28/r29
+ 307               	 * Result is passed in r24/r25
+ 308               	 */
+ 309               	#   define resL     r24
+ 310               	#   define resH     r25
+ 311               	#   define cnt16L   r24
+ 312               	#   define cnt16H   r25
+ 313               	#   define cntH     r26
+ 314               	#endif
+ 315               	#   define cnt16    cnt16L
+ 316               	
+ 317               	; extern unsigned usbMeasurePacketLength(void);
+ 318               	; returns time between two idle strobes in multiples of 7 CPU clocks
+ 319               	.global usbMeasureFrameLength
+ 320               	usbMeasureFrameLength:
+ 321               	    ldi     cntH, 6         ; wait ~ 10 ms for D- == 0
+ 322               	    clr     cnt16L
+ 323               	    clr     cnt16H
+ 324               	usbMFTime16:
+ 325               	    dec     cntH
+ 326               	    breq    usbMFTimeout
+ 327               	usbMFWaitStrobe:            ; first wait for D- == 0 (idle strobe)
+ 328               	    sbiw    cnt16, 1        ;[0] [6]
+ 329               	    breq    usbMFTime16     ;[2]
+ 330               	    sbic    USBIN, USBMINUS ;[3]
+ 331               	    rjmp    usbMFWaitStrobe ;[4]
+ 332               	usbMFWaitIdle:              ; then wait until idle again
+ 333               	    sbis    USBIN, USBMINUS ;1 wait for D- == 1
+ 334               	    rjmp    usbMFWaitIdle   ;2
+ 335               	    ldi     cnt16L, 1       ;1 represents cycles so far
+ 336               	    clr     cnt16H          ;1
+ 337               	usbMFWaitLoop:
+ 338               	    in      cntH, USBIN     ;[0] [7]
+ 339               	    adiw    cnt16, 1        ;[1]
+ 340               	    breq    usbMFTimeout    ;[3]
+ 341               	    andi    cntH, USBMASK   ;[4]
+ 342               	    brne    usbMFWaitLoop   ;[5]
+ 343               	usbMFTimeout:
+ 344               	#if resL != cnt16L
+ 345               	    mov     resL, cnt16L
+ 346               	    mov     resH, cnt16H
+ 347               	#endif
+ 348               	    ret
+ 349               	
+ 350               	#undef resL
+ 351               	#undef resH
+ 352               	#undef cnt16
+ 353               	#undef cnt16L
+ 354               	#undef cnt16H
+ 355               	#undef cntH
+ 356               	
+ 357               	#endif  /* USB_CFG_HAVE_MEASURE_FRAME_LENGTH */
+ 358               	
+ 359               	;----------------------------------------------------------------------------
+ 360               	; Now include the clock rate specific code
+ 361               	;----------------------------------------------------------------------------
+ 362               	
+ 363               	#ifndef USB_CFG_CLOCK_KHZ
+ 364               	#   ifdef F_CPU
+ 365               	#       define USB_CFG_CLOCK_KHZ (F_CPU/1000)
+ 366               	#   else
+ 367               	#       error "USB_CFG_CLOCK_KHZ not defined in usbconfig.h and no F_CPU set!"
+ 368               	#   endif
+ 369               	#endif
+ 370               	
+ 371               	#if USB_CFG_CHECK_CRC   /* separate dispatcher for CRC type modules */
+ 372               	#   if USB_CFG_CLOCK_KHZ == 18000
+ 373               	#       include "usbdrvasm18-crc.inc"
+ 374               	#   else
+ 375               	#       error "USB_CFG_CLOCK_KHZ is not one of the supported crc-rates!"
+ 376               	#   endif
+ 377               	#else   /* USB_CFG_CHECK_CRC */
+ 378               	#   if USB_CFG_CLOCK_KHZ == 12000
+ 379               	#       include "usbdrvasm12.inc"
+ 380               	#   elif USB_CFG_CLOCK_KHZ == 12800
+ 381               	#       include "usbdrvasm128.inc"
+ 382               	#   elif USB_CFG_CLOCK_KHZ == 15000
+ 383               	#       include "usbdrvasm15.inc"
+ 384               	#   elif USB_CFG_CLOCK_KHZ == 16000
+ 385               	#       include "usbdrvasm16.inc"
    1               	/* Name: usbdrvasm16.inc
    2               	 * Project: V-USB, virtual USB port for Atmel's(r) AVR(r) microcontrollers
    3               	 * Author: Christian Starkjohann
@@ -1289,124 +1289,125 @@
  185:usbdrv/asmcommon.inc ****     ldi     YH, hi8(usbTxBuf3)  ;[48]
  186:usbdrv/asmcommon.inc ****     rjmp    usbSendAndReti      ;[49] 51 + 12 = 63 until SOP
  187               	#endif
- 229               	c says:
- 230               	; idle = J
- 231               	; J = (D+ = 0), (D- = 1)
- 232               	; K = (D+ = 1), (D- = 0)
- 233               	; Spec allows 7.5 bit times from EOP to SOP for replies
- 234               	
- 235               	bitstuffN:
- 236               	    eor     x1, x4          ;[5]
- 237:usbdrv/usbdrvasm16.inc ****     ldi     x2, 0           ;[6]
- 238:usbdrv/usbdrvasm16.inc ****     nop2                    ;[7]
- 239:usbdrv/usbdrvasm16.inc ****     nop                     ;[9]
- 240:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x1      ;[10] <-- out
- 241:usbdrv/usbdrvasm16.inc ****     rjmp    didStuffN       ;[0]
- 242:usbdrv/usbdrvasm16.inc ****     
- 243               	bitstuff6:
- 244               	    eor     x1, x4          ;[5]
- 245:usbdrv/usbdrvasm16.inc ****     ldi     x2, 0           ;[6] Carry is zero due to brcc
- 246:usbdrv/usbdrvasm16.inc ****     rol     shift           ;[7] compensate for ror shift at branch destination
- 247:usbdrv/usbdrvasm16.inc ****     rjmp    didStuff6       ;[8]
- 248:usbdrv/usbdrvasm16.inc **** 
- 249               	bitstuff7:
- 250               	    ldi     x2, 0           ;[2] Carry is zero due to brcc
- 251:usbdrv/usbdrvasm16.inc ****     rjmp    didStuff7       ;[3]
- 252:usbdrv/usbdrvasm16.inc **** 
+ 229               	
+ 230               	; USB spec says:
+ 231               	; idle = J
+ 232               	; J = (D+ = 0), (D- = 1)
+ 233               	; K = (D+ = 1), (D- = 0)
+ 234               	; Spec allows 7.5 bit times from EOP to SOP for replies
+ 235               	
+ 236               	bitstuffN:
+ 237:usbdrv/usbdrvasm16.inc ****     eor     x1, x4          ;[5]
+ 238:usbdrv/usbdrvasm16.inc ****     ldi     x2, 0           ;[6]
+ 239:usbdrv/usbdrvasm16.inc ****     nop2                    ;[7]
+ 240:usbdrv/usbdrvasm16.inc ****     nop                     ;[9]
+ 241:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x1      ;[10] <-- out
+ 242:usbdrv/usbdrvasm16.inc ****     rjmp    didStuffN       ;[0]
+ 243               	    
+ 244               	bitstuff6:
+ 245:usbdrv/usbdrvasm16.inc ****     eor     x1, x4          ;[5]
+ 246:usbdrv/usbdrvasm16.inc ****     ldi     x2, 0           ;[6] Carry is zero due to brcc
+ 247:usbdrv/usbdrvasm16.inc ****     rol     shift           ;[7] compensate for ror shift at branch destination
+ 248:usbdrv/usbdrvasm16.inc ****     rjmp    didStuff6       ;[8]
+ 249               	
+ 250               	bitstuff7:
+ 251:usbdrv/usbdrvasm16.inc ****     ldi     x2, 0           ;[2] Carry is zero due to brcc
+ 252:usbdrv/usbdrvasm16.inc ****     rjmp    didStuff7       ;[3]
  253               	
- 254               	sendNakAndReti:
- 255               	    ldi     x3, USBPID_NAK  ;[-18]
- 256:usbdrv/usbdrvasm16.inc ****     rjmp    sendX3AndReti   ;[-17]
- 257:usbdrv/usbdrvasm16.inc **** sendAckAndReti:
- 258               	    ldi     cnt, USBPID_ACK ;[-17]
- 259:usbdrv/usbdrvasm16.inc **** sendCntAndReti:
- 260               	    mov     x3, cnt         ;[-16]
- 261:usbdrv/usbdrvasm16.inc **** sendX3AndReti:
- 262               	    ldi     YL, 20          ;[-15] x3==r20 address is 20
- 263:usbdrv/usbdrvasm16.inc ****     ldi     YH, 0           ;[-14]
- 264:usbdrv/usbdrvasm16.inc ****     ldi     cnt, 2          ;[-13]
- 265:usbdrv/usbdrvasm16.inc **** ;   rjmp    usbSendAndReti      fallthrough
- 266               	
- 267               	;usbSend:
- 268               	;pointer to data in 'Y'
- 269               	;number of bytes in 'cnt' -- including sync byte [range 2 ... 12]
- 270               	;uses: x1...x4, btcnt, shift, cnt, Y
- 271               	;Numbers in brackets are time since first bit of sync pattern is sent
- 272               	;We don't match the transfer rate exactly (don't insert leap cycles every third
- 273               	;byte) because the spec demands only 1.5% precision anyway.
- 274               	usbSendAndReti:             ; 12 cycles until SOP
- 275               	    in      x2, USBDDR      ;[-12]
- 276:usbdrv/usbdrvasm16.inc ****     ori     x2, USBMASK     ;[-11]
- 277:usbdrv/usbdrvasm16.inc ****     sbi     USBOUT, USBMINUS;[-10] prepare idle state; D+ and D- must have been 0 (no pullups)
- 278:usbdrv/usbdrvasm16.inc ****     in      x1, USBOUT      ;[-8] port mirror for tx loop
- 279:usbdrv/usbdrvasm16.inc ****     out     USBDDR, x2      ;[-7] <- acquire bus
- 280:usbdrv/usbdrvasm16.inc **** ; need not init x2 (bitstuff history) because sync starts with 0
- 281               	    ldi     x4, USBMASK     ;[-6] exor mask
- 282:usbdrv/usbdrvasm16.inc ****     ldi     shift, 0x80     ;[-5] sync byte is first byte sent
- 283:usbdrv/usbdrvasm16.inc **** txByteLoop:
- 284               	    ldi     bitcnt, 0x35    ;[-4] [6] binary 0011 0101
- 285:usbdrv/usbdrvasm16.inc **** txBitLoop:
- 286               	    sbrs    shift, 0        ;[-3] [7]
- 287:usbdrv/usbdrvasm16.inc ****     eor     x1, x4          ;[-2] [8]
- 288:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x1      ;[-1] [9] <-- out N
- 289:usbdrv/usbdrvasm16.inc ****     ror     shift           ;[0] [10]
- 290:usbdrv/usbdrvasm16.inc ****     ror     x2              ;[1]
- 291:usbdrv/usbdrvasm16.inc **** didStuffN:
- 292               	    cpi     x2, 0xfc        ;[2]
- 293:usbdrv/usbdrvasm16.inc ****     brcc    bitstuffN       ;[3]
- 294:usbdrv/usbdrvasm16.inc ****     lsr     bitcnt          ;[4]
- 295:usbdrv/usbdrvasm16.inc ****     brcc    txBitLoop       ;[5]
- 296:usbdrv/usbdrvasm16.inc ****     brne    txBitLoop       ;[6]
- 297:usbdrv/usbdrvasm16.inc **** 
- 298               	    sbrs    shift, 0        ;[7]
- 299:usbdrv/usbdrvasm16.inc ****     eor     x1, x4          ;[8]
- 300:usbdrv/usbdrvasm16.inc **** didStuff6:
- 301               	    out     USBOUT, x1      ;[-1] [9] <-- out 6
- 302:usbdrv/usbdrvasm16.inc ****     ror     shift           ;[0] [10]
- 303:usbdrv/usbdrvasm16.inc ****     ror     x2              ;[1]
- 304:usbdrv/usbdrvasm16.inc ****     cpi     x2, 0xfc        ;[2]
- 305:usbdrv/usbdrvasm16.inc ****     brcc    bitstuff6       ;[3]
- 306:usbdrv/usbdrvasm16.inc ****     ror     shift           ;[4]
- 307:usbdrv/usbdrvasm16.inc **** didStuff7:
- 308               	    ror     x2              ;[5]
- 309:usbdrv/usbdrvasm16.inc ****     sbrs    x2, 7           ;[6]
- 310:usbdrv/usbdrvasm16.inc ****     eor     x1, x4          ;[7]
- 311:usbdrv/usbdrvasm16.inc ****     nop                     ;[8]
- 312:usbdrv/usbdrvasm16.inc ****     cpi     x2, 0xfc        ;[9]
- 313:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x1      ;[-1][10] <-- out 7
- 314:usbdrv/usbdrvasm16.inc ****     brcc    bitstuff7       ;[0] [11]
- 315:usbdrv/usbdrvasm16.inc ****     ld      shift, y+       ;[1]
- 316:usbdrv/usbdrvasm16.inc ****     dec     cnt             ;[3]
- 317:usbdrv/usbdrvasm16.inc ****     brne    txByteLoop      ;[4]
- 318:usbdrv/usbdrvasm16.inc **** ;make SE0:
- 319               	    cbr     x1, USBMASK     ;[5] prepare SE0 [spec says EOP may be 21 to 25 cycles]
- 320:usbdrv/usbdrvasm16.inc ****     lds     x2, usbNewDeviceAddr;[6]
- 321:usbdrv/usbdrvasm16.inc ****     lsl     x2              ;[8] we compare with left shifted address
- 322:usbdrv/usbdrvasm16.inc ****     subi    YL, 20 + 2      ;[9] Only assign address on data packets, not ACK/NAK in x3
- 323:usbdrv/usbdrvasm16.inc ****     sbci    YH, 0           ;[10]
- 324:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x1      ;[11] <-- out SE0 -- from now 2 bits = 22 cycles until bus idle
- 325:usbdrv/usbdrvasm16.inc **** ;2006-03-06: moved transfer of new address to usbDeviceAddr from C-Code to asm:
- 326               	;set address only after data packet was sent, not after handshake
- 327               	    breq    skipAddrAssign  ;[0]
- 328:usbdrv/usbdrvasm16.inc ****     sts     usbDeviceAddr, x2; if not skipped: SE0 is one cycle longer
- 329:usbdrv/usbdrvasm16.inc **** skipAddrAssign:
- 330               	;end of usbDeviceAddress transfer
- 331               	    ldi     x2, 1<<USB_INTR_PENDING_BIT;[2] int0 occurred during TX -- clear pending flag
- 332:usbdrv/usbdrvasm16.inc ****     USB_STORE_PENDING(x2)   ;[3]
- 333:usbdrv/usbdrvasm16.inc ****     ori     x1, USBIDLE     ;[4]
- 334:usbdrv/usbdrvasm16.inc ****     in      x2, USBDDR      ;[5]
- 335:usbdrv/usbdrvasm16.inc ****     cbr     x2, USBMASK     ;[6] set both pins to input
- 336:usbdrv/usbdrvasm16.inc ****     mov     x3, x1          ;[7]
- 337:usbdrv/usbdrvasm16.inc ****     cbr     x3, USBMASK     ;[8] configure no pullup on both pins
- 338:usbdrv/usbdrvasm16.inc ****     ldi     x4, 4           ;[9]
- 339:usbdrv/usbdrvasm16.inc **** se0Delay:
- 340               	    dec     x4              ;[10] [13] [16] [19]
- 341:usbdrv/usbdrvasm16.inc ****     brne    se0Delay        ;[11] [14] [17] [20]
- 342:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x1      ;[21] <-- out J (idle) -- end of SE0 (EOP signal)
- 343:usbdrv/usbdrvasm16.inc ****     out     USBDDR, x2      ;[22] <-- release bus now
- 344:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x3      ;[23] <-- ensure no pull-up resistors are active
- 345:usbdrv/usbdrvasm16.inc ****     rjmp    doReturn
- 346:usbdrv/usbdrvasm16.inc **** ...
+ 254               	
+ 255               	sendNakAndReti:
+ 256:usbdrv/usbdrvasm16.inc ****     ldi     x3, USBPID_NAK  ;[-18]
+ 257:usbdrv/usbdrvasm16.inc ****     rjmp    sendX3AndReti   ;[-17]
+ 258               	sendAckAndReti:
+ 259:usbdrv/usbdrvasm16.inc ****     ldi     cnt, USBPID_ACK ;[-17]
+ 260               	sendCntAndReti:
+ 261:usbdrv/usbdrvasm16.inc ****     mov     x3, cnt         ;[-16]
+ 262               	sendX3AndReti:
+ 263:usbdrv/usbdrvasm16.inc ****     ldi     YL, 20          ;[-15] x3==r20 address is 20
+ 264:usbdrv/usbdrvasm16.inc ****     ldi     YH, 0           ;[-14]
+ 265:usbdrv/usbdrvasm16.inc ****     ldi     cnt, 2          ;[-13]
+ 266               	;   rjmp    usbSendAndReti      fallthrough
+ 267               	
+ 268               	;usbSend:
+ 269               	;pointer to data in 'Y'
+ 270               	;number of bytes in 'cnt' -- including sync byte [range 2 ... 12]
+ 271               	;uses: x1...x4, btcnt, shift, cnt, Y
+ 272               	;Numbers in brackets are time since first bit of sync pattern is sent
+ 273               	;We don't match the transfer rate exactly (don't insert leap cycles every third
+ 274               	;byte) because the spec demands only 1.5% precision anyway.
+ 275               	usbSendAndReti:             ; 12 cycles until SOP
+ 276:usbdrv/usbdrvasm16.inc ****     in      x2, USBDDR      ;[-12]
+ 277:usbdrv/usbdrvasm16.inc ****     ori     x2, USBMASK     ;[-11]
+ 278:usbdrv/usbdrvasm16.inc ****     sbi     USBOUT, USBMINUS;[-10] prepare idle state; D+ and D- must have been 0 (no pullups)
+ 279:usbdrv/usbdrvasm16.inc ****     in      x1, USBOUT      ;[-8] port mirror for tx loop
+ 280:usbdrv/usbdrvasm16.inc ****     out     USBDDR, x2      ;[-7] <- acquire bus
+ 281               	; need not init x2 (bitstuff history) because sync starts with 0
+ 282:usbdrv/usbdrvasm16.inc ****     ldi     x4, USBMASK     ;[-6] exor mask
+ 283:usbdrv/usbdrvasm16.inc ****     ldi     shift, 0x80     ;[-5] sync byte is first byte sent
+ 284               	txByteLoop:
+ 285:usbdrv/usbdrvasm16.inc ****     ldi     bitcnt, 0x35    ;[-4] [6] binary 0011 0101
+ 286               	txBitLoop:
+ 287:usbdrv/usbdrvasm16.inc ****     sbrs    shift, 0        ;[-3] [7]
+ 288:usbdrv/usbdrvasm16.inc ****     eor     x1, x4          ;[-2] [8]
+ 289:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x1      ;[-1] [9] <-- out N
+ 290:usbdrv/usbdrvasm16.inc ****     ror     shift           ;[0] [10]
+ 291:usbdrv/usbdrvasm16.inc ****     ror     x2              ;[1]
+ 292               	didStuffN:
+ 293:usbdrv/usbdrvasm16.inc ****     cpi     x2, 0xfc        ;[2]
+ 294:usbdrv/usbdrvasm16.inc ****     brcc    bitstuffN       ;[3]
+ 295:usbdrv/usbdrvasm16.inc ****     lsr     bitcnt          ;[4]
+ 296:usbdrv/usbdrvasm16.inc ****     brcc    txBitLoop       ;[5]
+ 297:usbdrv/usbdrvasm16.inc ****     brne    txBitLoop       ;[6]
+ 298               	
+ 299:usbdrv/usbdrvasm16.inc ****     sbrs    shift, 0        ;[7]
+ 300:usbdrv/usbdrvasm16.inc ****     eor     x1, x4          ;[8]
+ 301               	didStuff6:
+ 302:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x1      ;[-1] [9] <-- out 6
+ 303:usbdrv/usbdrvasm16.inc ****     ror     shift           ;[0] [10]
+ 304:usbdrv/usbdrvasm16.inc ****     ror     x2              ;[1]
+ 305:usbdrv/usbdrvasm16.inc ****     cpi     x2, 0xfc        ;[2]
+ 306:usbdrv/usbdrvasm16.inc ****     brcc    bitstuff6       ;[3]
+ 307:usbdrv/usbdrvasm16.inc ****     ror     shift           ;[4]
+ 308               	didStuff7:
+ 309:usbdrv/usbdrvasm16.inc ****     ror     x2              ;[5]
+ 310:usbdrv/usbdrvasm16.inc ****     sbrs    x2, 7           ;[6]
+ 311:usbdrv/usbdrvasm16.inc ****     eor     x1, x4          ;[7]
+ 312:usbdrv/usbdrvasm16.inc ****     nop                     ;[8]
+ 313:usbdrv/usbdrvasm16.inc ****     cpi     x2, 0xfc        ;[9]
+ 314:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x1      ;[-1][10] <-- out 7
+ 315:usbdrv/usbdrvasm16.inc ****     brcc    bitstuff7       ;[0] [11]
+ 316:usbdrv/usbdrvasm16.inc ****     ld      shift, y+       ;[1]
+ 317:usbdrv/usbdrvasm16.inc ****     dec     cnt             ;[3]
+ 318:usbdrv/usbdrvasm16.inc ****     brne    txByteLoop      ;[4]
+ 319               	;make SE0:
+ 320:usbdrv/usbdrvasm16.inc ****     cbr     x1, USBMASK     ;[5] prepare SE0 [spec says EOP may be 21 to 25 cycles]
+ 321:usbdrv/usbdrvasm16.inc ****     lds     x2, usbNewDeviceAddr;[6]
+ 322:usbdrv/usbdrvasm16.inc ****     lsl     x2              ;[8] we compare with left shifted address
+ 323:usbdrv/usbdrvasm16.inc ****     subi    YL, 20 + 2      ;[9] Only assign address on data packets, not ACK/NAK in x3
+ 324:usbdrv/usbdrvasm16.inc ****     sbci    YH, 0           ;[10]
+ 325:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x1      ;[11] <-- out SE0 -- from now 2 bits = 22 cycles until bus idle
+ 326               	;2006-03-06: moved transfer of new address to usbDeviceAddr from C-Code to asm:
+ 327               	;set address only after data packet was sent, not after handshake
+ 328:usbdrv/usbdrvasm16.inc ****     breq    skipAddrAssign  ;[0]
+ 329:usbdrv/usbdrvasm16.inc ****     sts     usbDeviceAddr, x2; if not skipped: SE0 is one cycle longer
+ 330               	skipAddrAssign:
+ 331               	;end of usbDeviceAddress transfer
+ 332:usbdrv/usbdrvasm16.inc ****     ldi     x2, 1<<USB_INTR_PENDING_BIT;[2] int0 occurred during TX -- clear pending flag
+ 333:usbdrv/usbdrvasm16.inc ****     USB_STORE_PENDING(x2)   ;[3]
+ 334:usbdrv/usbdrvasm16.inc ****     ori     x1, USBIDLE     ;[4]
+ 335:usbdrv/usbdrvasm16.inc ****     in      x2, USBDDR      ;[5]
+ 336:usbdrv/usbdrvasm16.inc ****     cbr     x2, USBMASK     ;[6] set both pins to input
+ 337:usbdrv/usbdrvasm16.inc ****     mov     x3, x1          ;[7]
+ 338:usbdrv/usbdrvasm16.inc ****     cbr     x3, USBMASK     ;[8] configure no pullup on both pins
+ 339:usbdrv/usbdrvasm16.inc ****     ldi     x4, 4           ;[9]
+ 340               	se0Delay:
+ 341:usbdrv/usbdrvasm16.inc ****     dec     x4              ;[10] [13] [16] [19]
+ 342:usbdrv/usbdrvasm16.inc ****     brne    se0Delay        ;[11] [14] [17] [20]
+ 343:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x1      ;[21] <-- out J (idle) -- end of SE0 (EOP signal)
+ 344:usbdrv/usbdrvasm16.inc ****     out     USBDDR, x2      ;[22] <-- release bus now
+ 345:usbdrv/usbdrvasm16.inc ****     out     USBOUT, x3      ;[23] <-- ensure no pull-up resistors are active
+ 346:usbdrv/usbdrvasm16.inc ****     rjmp    doReturn
+ 347               	...
 DEFINED SYMBOLS
 usbdrv/usbdrvasm16.inc:33     .text:00000032 __vector_1
   usbdrv/usbdrvasm.S:233    .text:00000000 usbCrc16

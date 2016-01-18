@@ -53,7 +53,13 @@ long random(long howsmall, long howbig)
 
 long map(long x, long in_min, long in_max, long out_min, long out_max)
 {
-  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	if(x < in_min) {
+		x = in_min;
+	} else if(x > in_max) {
+		x = in_max;
+	}
+
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 unsigned int makeWord(unsigned int w) { return w; }

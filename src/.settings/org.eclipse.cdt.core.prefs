@@ -1,0 +1,12 @@
+eclipse.preferences.version=1
+environment/project/de.innot.avreclipse.toolchain.winavr.base.120027378/AVRDUDEPATH/delimiter=\:
+environment/project/de.innot.avreclipse.toolchain.winavr.base.120027378/AVRDUDEPATH/operation=replace
+environment/project/de.innot.avreclipse.toolchain.winavr.base.120027378/AVRDUDEPATH/value=/Applications/Arduino105.app/Contents/Resources/Java/hardware/tools/avr/bin/
+environment/project/de.innot.avreclipse.toolchain.winavr.base.120027378/CPATH/delimiter=\:
+environment/project/de.innot.avreclipse.toolchain.winavr.base.120027378/CPATH/operation=replace
+environment/project/de.innot.avreclipse.toolchain.winavr.base.120027378/CPATH/value=/Applications/Arduino105.app/Contents/Resources/Java/hardware/tools/avr/lib/gcc/avr/4.3.2/include
+environment/project/de.innot.avreclipse.toolchain.winavr.base.120027378/PATH/delimiter=\:
+environment/project/de.innot.avreclipse.toolchain.winavr.base.120027378/PATH/operation=replace
+environment/project/de.innot.avreclipse.toolchain.winavr.base.120027378/PATH/value=/Applications/Arduino105.app/Contents/Resources/Java/hardware/tools/avr/bin\:/usr/bin\:/usr/local/bin\:/bin\:/usr/sbin\:/sbin
+environment/project/de.innot.avreclipse.toolchain.winavr.base.120027378/append=true
+environment/project/de.innot.avreclipse.toolchain.winavr.base.120027378/appendContributed=true
