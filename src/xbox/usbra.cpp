@@ -368,9 +368,9 @@ void gc_loop() {
 		gamepad_state.black = ((button_data[1] & 0x10) > 0) * 0xFF;
 
 		gamepad_state.l_x = map(button_data[2], 32, 223, -32768, 32767);
-		gamepad_state.l_y = map(~button_data[3], 32, 223, 32767, -32768);
+		gamepad_state.l_y = map((byte)~button_data[3], 32, 223, 32767, -32768);
 		gamepad_state.r_x = map(button_data[4], 32, 223, -32768, 32767);
-		gamepad_state.r_y = map(~button_data[5], 32, 223, 32767, -32768);
+		gamepad_state.r_y = map((byte)~button_data[5], 32, 223, 32767, -32768);
 
 		((button_data[1] & 0x08) && (button_data[0] & 0x10)) ? bitSet(gamepad_state.digital_buttons, XBOX_RIGHT_STICK) : bitClear(gamepad_state.digital_buttons, XBOX_RIGHT_STICK);
 
