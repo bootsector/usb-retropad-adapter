@@ -22,7 +22,7 @@
 /* ----------------------------- USB interface ----------------------------- */
 /* ------------------------------------------------------------------------- */
 
-PROGMEM char usbHidReportDescriptor[114] = { /* USB report descriptor, size must match usbconfig.h */
+const PROGMEM char usbHidReportDescriptor[114] = { /* USB report descriptor, size must match usbconfig.h */
 0x05, 0x01, // USAGE_PAGE (Generic Desktop)
 		0x09, 0x05, // USAGE (Gamepad)
 		0xa1, 0x01, // COLLECTION (Application)

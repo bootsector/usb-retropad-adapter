@@ -25,7 +25,7 @@ static int padDetected = 0;
 /* ------------------------------------------------------------------------- */
 
 //XXX: Dual Strike defines /* bMaxPacketSize0 0x40 */ as 0x08
-PROGMEM char usbDescriptorDevice[18] = {	/* USB device descriptor */
+const PROGMEM char usbDescriptorDevice[18] = {	/* USB device descriptor */
 		0x12,						/* bLength 0x12 */
 		USBDESCR_DEVICE,			/* bDescriptorType 0x01 */
 		0x10, 0x01,					/* bcdUSB 0x0110 (USB spec. 01.10) */
@@ -43,7 +43,7 @@ PROGMEM char usbDescriptorDevice[18] = {	/* USB device descriptor */
 };
 
 //XXX: Dual Strike defines /* wMaxPacketSize 0x0020- Must be full speed device */ as 0x08, 0x00
-PROGMEM char usbDescriptorConfiguration[32] = {
+const PROGMEM char usbDescriptorConfiguration[32] = {
 		0x09,				/* bLength 0x09 */
 		USBDESCR_CONFIG,	/* bDescriptorType 0x02 */
 		0x20, 0x00,			/* wTotalLength 0x0020 (32) */
