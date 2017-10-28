@@ -19,11 +19,11 @@ BOOTLOADER_ADDRESS = 7800
 F_CPU = 16000000
 FUSEH = 0xDA
 FUSEL = 0xF7
-FUSEE = 0x03
+FUSEE = 0xFB
 
 ###############################################################################
 
-AVRDUDE = avrdude -c stk500v1 -P /dev/tty.usbmodem12341 -b 19200 -p $(DEVICE) -C "/Applications/Arduino105.app/Contents/Resources/Java/hardware/tools/avr/etc/avrdude.conf"
+AVRDUDE = avrdude -c stk500v1 -P /dev/tty.usbmodem12341 -b 19200 -p $(DEVICE) -C "/usr/local/etc/avrdude.conf"
 
 LDFLAGS += -Wl,--relax,--gc-sections -Wl,--section-start=.text=$(BOOTLOADER_ADDRESS)
 
