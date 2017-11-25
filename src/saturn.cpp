@@ -27,7 +27,7 @@
 #define D3 10
 #define D2 11
 
-#define DELAY 7
+#define DELAY 4
 
 void saturn_init() {
 	pinModeFast(D1, INPUT);
@@ -41,6 +41,9 @@ void saturn_init() {
 	digitalWriteFast(D0, HIGH);
 	digitalWriteFast(D3, HIGH);
 	digitalWriteFast(D2, HIGH);
+
+	digitalWriteFast(S0, HIGH);
+	digitalWriteFast(S1, HIGH);
 }
 
 int saturn_read() {
